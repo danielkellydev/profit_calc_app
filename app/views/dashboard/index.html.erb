@@ -1,4 +1,74 @@
-<div>
-  <h1 class="font-bold text-4xl">Dashboard#index</h1>
-  <p>Find me in app/views/dashboard/index.html.erb</p>
+<div class="container mx-auto px-4">
+  <h1 class="text-4xl font-bold mb-4 text-teal-700">Dashboard</h1>
+  <%= link_to "Edit Products", edit_products_dashboard_index_path, class: "text-teal-500 underline", data: { turbo_action: 'replace', turbo_frame: 'products_frame' } %>
+  <div class="bg-gray-200 border border-gray-400 sm:rounded-none mb-4 p-4">
+    <h2 class="text-3xl font-bold mb-4 text-teal-700">New Sale</h2>
+    <%= form_with model: Sale.new, url: create_sale_dashboard_index_path, class: 'space-y-4', data: { turbo_frame: "sales_frame" } do |form| %>
+      <div class="grid grid-cols-3 gap-4">
+        <% @products.sort_by(&:name).each do |product| %>
+          <div class="product-card border border-gray-400 rounded-none p-4">
+            <h2 class="text-xl font-bold mb-2 text-teal-700"><%= product.name %></h2>
+            <%= form.label "quantity[#{product.id}]", 'Quantity', class: 'block text-sm font-medium text-gray-700' %>
+            <%= form.number_field "quantity[#{product.id}]", min: 0, value: 0, class: 'mt-1 block w-full py-2 px-3 border border-gray-400 bg-white rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= form.label :sale_type, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.select :sale_type, ['new face to face', 'return face to face', 'online'], {}, class: 'mt-1 block w-full py-2 px-3 border border-gray-400 bg-white rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :total_received, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.number_field :total_received, class: 'mt-1 block w-full py-2 px-3 border border-gray-400 bg-white rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+      </div>
+
+      <%= form.submit "Record Sale", class: 'mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-none text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500' %>
+    <% end %>
+  </div>
+</div>
+
+  <div class="bg-gray-200 border border-gray-400 sm:rounded-none mb-4 p-4">
+  <h2 class="text-3xl font-bold mb-4 text-teal-700">Weekly Data</h2>
+
+  <div class="mb-4">
+    <p class="mb-2">Week of <%= Date.today.at_beginning_of_week %> to <%= Date.today.at_end_of_week %></p>
+    <p class="mb-2">Total Revenue: <%= number_to_currency(@total_revenue) %></p>
+    <p class="mb-2">COGS: <%= number_to_currency(@cogs) %></p>
+    <p class="mb-4">Profit: <%= number_to_currency(@profit) %></p>
+  </div>
+
+  <div class="mb-4">
+    <h3 class="text-2xl font-bold mb-2 text-teal-700">Specific Revenue</h3>
+    <p class="mb-2">New face to face: <%= number_to_currency(@new_face_to_face_revenue) %> </p>
+    <p class="mb-2">Return face to face: <%= number_to_currency(@return_face_to_face_revenue) %> </p>
+    <p class="mb-2">Online: <%= number_to_currency(@online_revenue) %> </p>
+  </div>
+
+  <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "text-teal-500 underline", data: { turbo_action: 'replace', turbo_frame: 'history_frame' } %>
+</div>
+
+<div class="bg-gray-200 border border-gray-400 sm:rounded-none mb-4 p-4">
+  <h2 class="text-3xl font-bold mb-4 text-teal-700">Weekly Sales Record</h2>
+  <%= turbo_frame_tag 'sales_record_frame' do %>
+    <% @sales.sort_by(&:id).reverse.each do |sale| %>
+      <div class="sale-record border border-gray-400 rounded-none p-4 mb-4">
+        <h2 class="text-xl font-bold mb-2 text-teal-700">Sale ID: <%= sale.id %></h2>
+        <p class="mb-2">Products sold:</p>
+        <ul class="list-disc list-inside mb-2">
+          <% sale.sale_items.each do |item| %>
+            <li><%= "#{item.product.name} (#{item.quantity})" %></li>
+          <% end %>
+        </ul>
+        <p class="mb-2">Total Revenue: <%= number_to_currency(sale.total_received) %></p>
+
+        <div class="flex space-x-4">
+          <%= link_to "Edit", edit_sale_path(sale), class: "text-teal-500 underline" %>
+          <%= button_to "Delete", sale_path(sale), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-500 underline" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>
 </div>

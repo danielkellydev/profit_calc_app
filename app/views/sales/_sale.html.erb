@@ -1,0 +1,5 @@
+<% sale.sale_items.each do |sale_item| %>
+  <h2><%= sale_item.product.name %></h2>
+  <p>Quantity: <%= sale_item.quantity %></p>
+  <p>Sale Price: <%= sale_item.price %></p>
+<% end %>

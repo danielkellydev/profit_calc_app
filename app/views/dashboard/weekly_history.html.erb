@@ -1,0 +1,12 @@
+<turbo-frame id="weekly-history">
+  <h1 class="text-2xl font-bold mb-4">Weekly History</h1>
+
+  <% @weekly_history.each do |data| %>
+    <div class="bg-white shadow rounded-lg p-6 mb-4">
+      <h2 class="text-xl font-semibold mb-2">Week <%= data[:week_of_year] %> (<%= data[:start_date].strftime('%B %d, %Y') %> - <%= data[:end_date].strftime('%B %d, %Y') %>):</h2>
+      <p class="mb-1">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
+      <p class="mb-1">COGS: <%= number_to_currency(data[:cogs]) %></p>
+      <p>Profit: <%= number_to_currency(data[:profit]) %></p>
+    </div>
+  <% end %>
+</turbo-frame>

@@ -1,0 +1,13 @@
+<div class="max-w-md mx-auto bg-white shadow-md overflow-hidden md:max-w-2xl m-4">
+  <div class="md:flex">
+    <div class="p-8">
+      <div class="uppercase tracking-wide text-sm text-teal-500 font-semibold">Product</div>
+      <h2 class="block mt-1 text-lg leading-tight font-medium text-black"><%= product.name %></h2>
+      <p class="mt-2 text-gray-500">Cost of Goods Sold: <%= number_to_currency(product.cogs) %></p>
+      <%= link_to 'Edit', edit_product_path(product), class: "mt-4 inline-block bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4" %>
+      <%= form_with url: product_path(product), method: :delete, class: "inline" do %>
+        <%= submit_tag 'Delete', data: { confirm: 'Are you sure?' }, class: "mt-4 inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4" %>
+      <% end %>
+    </div>
+  </div>
+</div>

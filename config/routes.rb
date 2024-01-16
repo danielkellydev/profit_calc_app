@@ -1,7 +1,14 @@
 Rails.application.routes.draw do
-  get 'dashboard/index'
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  resources :dashboard, only: [:index], controller: 'dashboard' do
+    collection do
+      post :create_sale
+      get :edit_products
+      post :create_product
+      get :weekly_history
+      get :sales_record
+    end
+  end
 
-  # Defines the root path route ("/")
-  # root "articles#index"
+  resources :products, only: [:edit, :update, :destroy]
+  resources :sales, only: [:edit, :update, :destroy] # Add this line
 end
