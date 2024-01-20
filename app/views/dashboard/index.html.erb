@@ -1,9 +1,9 @@
-<div class="container mx-auto px-4">
+<div class="container mx-auto">
   <h1 class="text-4xl font-bold mb-4 text-teal-700">Dashboard</h1>
-  <%= link_to "Edit Products", edit_products_dashboard_index_path, class: "text-teal-500 underline", data: { turbo_action: 'replace', turbo_frame: 'products_frame' } %>
+  <%= link_to "Edit Products", edit_all_products_path, class: "text-teal-500 underline", data: { turbo_action: 'replace', turbo_frame: 'products_frame' } %>
   <div class="bg-gray-200 border border-gray-400 sm:rounded-none mb-4 p-4">
     <h2 class="text-3xl font-bold mb-4 text-teal-700">New Sale</h2>
-    <%= form_with model: Sale.new, url: create_sale_dashboard_index_path, class: 'space-y-4', data: { turbo_frame: "sales_frame" } do |form| %>
+    <%= form_with model: Sale.new, url: sales_path, class: 'space-y-4', data: { turbo_frame: "sales_frame" } do |form| %>
       <div class="grid grid-cols-3 gap-4">
         <% @products.sort_by(&:name).each do |product| %>
           <div class="product-card border border-gray-400 rounded-none p-4">

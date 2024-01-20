@@ -1,4 +1,26 @@
 class SalesController < ApplicationController
+  
+  def create 
+    @sale = Sale.new(sale_params.except(:quantity))
+    @sale.week_of_year = Date.today.cweek
+    @sale.year = Date.today.year 
+  
+    if @sale.save
+      params[:sale][:quantity].each do |product_id, quantity|
+        product = Product.find_by(id: product_id.to_i)
+        if product && quantity.to_i > 0
+          sale_item = @sale.sale_items.new(product_id: product_id.to_i, quantity: quantity, cogs: product.cogs * quantity.to_i)
+          sale_item.save
+        end
+      end
+      redirect_to dashboard_index_path
+    else
+      @products = Product.all
+      @sales = Sale.where(week_of_year: Date.today.cweek, year: Date.today.year)
+      render :index 
+    end
+  end
+  
   def destroy
     @sale = Sale.find(params[:id])
     @sale.destroy
