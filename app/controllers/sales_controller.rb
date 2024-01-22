@@ -1,4 +1,5 @@
 class SalesController < ApplicationController
+  before_action :set_weekly_sales, only: [:index]
   
   def create 
     @sale = Sale.new(sale_params.except(:quantity))
@@ -43,6 +44,6 @@ class SalesController < ApplicationController
   private
 
   def sale_params
-    params.require(:sale).permit(:sale_type, :total_received, sale_items_attributes: [:id, :quantity, :product_id])
+    params.require(:sale).permit(:sale_type, :total_received, :sale_date, sale_items_attributes: [:id, :quantity, :product_id])
   end
 end

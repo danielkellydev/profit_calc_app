@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_20_201408) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_22_003959) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -43,6 +43,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_20_201408) do
     t.integer "quantity"
     t.decimal "total_revenue"
     t.integer "year"
+    t.date "sale_date"
     t.index ["product_id"], name: "index_sales_on_product_id"
   end
 

@@ -15,6 +15,11 @@
       </div>
 
       <div>
+        <%= form.label :sale_date, class: 'block text-sm font-medium text-gray-700' %>
+        <%= form.date_field :sale_date, value: Date.current, class: 'mt-1 block w-full py-2 px-3 border border-gray-400 bg-white rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+      </div>
+
+      <div>
         <%= form.label :sale_type, class: 'block text-sm font-medium text-gray-700' %>
         <%= form.select :sale_type, ['new face to face', 'return face to face', 'online'], {}, class: 'mt-1 block w-full py-2 px-3 border border-gray-400 bg-white rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
       </div>
@@ -55,6 +60,7 @@
     <% @sales.sort_by(&:id).reverse.each do |sale| %>
       <div class="sale-record border border-gray-400 rounded-none p-4 mb-4">
         <h2 class="text-xl font-bold mb-2 text-teal-700">Sale ID: <%= sale.id %></h2>
+        <p class="mb-2">Sale Date: <%= sale.sale_date.strftime("%d/%m/%Y") %></p>
         <p class="mb-2">Products sold:</p>
         <ul class="list-disc list-inside mb-2">
           <% sale.sale_items.each do |item| %>

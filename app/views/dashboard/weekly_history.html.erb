@@ -8,6 +8,13 @@
       <p class="mb-1">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
       <p class="mb-1">COGS: <%= number_to_currency(data[:cogs]) %></p>
       <p>Profit: <%= number_to_currency(data[:profit]) %></p>
+
+      <div class="bg-gray-200 p-4 mt-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2">Specific Revenue:</h3>
+        <p class="mb-1">New face to face: <%= number_to_currency(data[:new_face_to_face_revenue]) %></p>
+        <p class="mb-1">Return face to face: <%= number_to_currency(data[:return_face_to_face_revenue]) %></p>
+        <p>Online: <%= number_to_currency(data[:online_revenue]) %></p>
+      </div>
     </div>
   <% end %>
 </turbo-frame>
