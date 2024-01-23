@@ -3,8 +3,9 @@ class SalesController < ApplicationController
   
   def create 
     @sale = Sale.new(sale_params.except(:quantity))
-    @sale.week_of_year = Date.today.cweek
-    @sale.year = Date.today.year 
+    @sale_date = @sale.sale_date || Date.today
+    @sale.week_of_year = @sale_date.cweek
+    @sale.year = @sale_date.year 
   
     if @sale.save
       params[:sale][:quantity].each do |product_id, quantity|
