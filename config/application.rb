@@ -13,6 +13,7 @@ module ProfitCalcApp
 
     # configure timezone to Melbourne, Australia
     config.time_zone = "Melbourne"
+    config.active_record.default_timezone = :local
 
 
     # Configuration for the application, engines, and railties goes here.
