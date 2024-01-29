@@ -1,24 +1,21 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a profit tracking application for a product business. Products can be created, edited and deleted. Each product will have COGS (Cost of Goods Sold) assigned to it. The actual sale price of a product may vary, hence the total revenue of each individual sale is entered at the time of sale, with the profit being calculated accordingly. 
 
-Things you may want to cover:
+<br>
+Once products are created, a new sale can be made.
 
-* Ruby version
+![new sale](app/assets/images/new_sale.png)
 
-* System dependencies
 
-* Configuration
+Each sale of the current week is displayed down the bottom of the dashboard. The weekly summary is displayed too. 
+![weekly data](app/assets/images/weekly_data.png)
 
-* Database creation
+Products can be created, edited and deleted. 
+![edit_products](app/assets/images/edit_products.png)
 
-* Database initialization
+Previous weeks can be viewed in the ***weekly history*** view. 
+![weekly_history](app/assets/images/weekly_history.png)
 
-* How to run the test suite
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+Feel free to clone the repository and have a play, or customise it to your needs!
