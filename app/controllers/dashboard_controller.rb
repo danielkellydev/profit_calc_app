@@ -41,6 +41,7 @@ class DashboardController < ApplicationController
   
       { week_of_year: sale.week_of_year, year: sale.year, start_date: start_date, end_date: end_date, total_revenue: sale.total_revenue, cogs: cogs, profit: profit, new_face_to_face_revenue: new_face_to_face_revenue, return_face_to_face_revenue: return_face_to_face_revenue, online_revenue: online_revenue }
     end
+    @weekly_history = @weekly_history.reject { |data| data[:year].nil? || data[:week_of_year].nil? }
     @weekly_history = @weekly_history.compact.sort_by { |data| [data[:year] || 0, data[:week_of_year] || 0] }.reverse!
   end
 
