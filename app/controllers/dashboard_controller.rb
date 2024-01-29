@@ -1,5 +1,6 @@
 class DashboardController < ApplicationController
   before_action :set_weekly_data, only: [:index, :weekly_history]
+  before_action :get_time_zone
 
   def index
     set_weekly_data
@@ -20,6 +21,10 @@ class DashboardController < ApplicationController
     @new_face_to_face_revenue = sales.where(sale_type: 'new face to face').sum(:total_received)
     @return_face_to_face_revenue = sales.where(sale_type: 'return face to face').sum(:total_received)
     @online_revenue = sales.where(sale_type: 'online').sum(:total_received)
+  end
+
+  def get_time_zone
+    @time_zone = Time.zone.name
   end
 
   def weekly_history
