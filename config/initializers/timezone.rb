@@ -1,3 +1,3 @@
 Timezone::Lookup.config(:google) do |c|
-  c.api_key = Rails.application.credentials.dig(:google, :api_key)
+  c.api_key = ENV['GOOGLE_API_KEY']
 end
