@@ -1,21 +1,23 @@
 <div class="container mx-auto px-4">
-  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'bg-teal-500 text-white p-2 mb-4 inline-block' %>
+  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'border-2 border-gray-800 hover:border-blue-500 text-gray-800 p-2 mb-4 inline-block cursor-pointer' %>
 
-  <h1 class="text-2xl text-center mb-4 text-teal-700">Edit Products</h1>
+  <div class="bg-gray-800 p-6 rounded-lg">
+  <h1 class="text-2xl text-center mb-4 text-white">Edit Products</h1>
 
   <%= form_with model: Product.new, url: products_path, data: { turbo_frame: "products_frame" }, html: { class: "flex flex-col items-center space-y-4" } do |form| %>
     <div class="flex flex-col">
-      <%= form.label :name, class: "font-bold mb-2 text-teal-700" %>
+      <%= form.label :name, class: "font-bold mb-2 text-white" %>
       <%= form.text_field :name, class: "border-2 border-gray-300 p-2" %>
     </div>
 
     <div class="flex flex-col">
-      <%= form.label :cogs, class: "font-bold mb-2 text-teal-700" %>
+      <%= form.label :cogs, class: "font-bold mb-2 text-white" %>
       <%= form.number_field :cogs, class: "border-2 border-gray-300 p-2" %>
     </div>
 
-    <%= form.submit "Add product", class: "bg-teal-500 text-white p-2" %>
+    <%= form.submit "Add product", class: "border-2 border-white hover:border-blue-500 text-white p-2 cursor-pointer" %>
   <% end %>
+  </div>
 
   <%= turbo_frame_tag 'products_frame' do %>
     <%= render @products %>

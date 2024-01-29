@@ -1,16 +1,16 @@
-<turbo-frame id="weekly-history">
-  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'bg-teal-500 text-white p-2 mb-4 inline-block', data: { turbo_frame: '_top' } %>
-  <h1 class="text-2xl font-bold mb-4">Weekly History</h1>
+<turbo-frame id="weekly-history" class=" text-white">
+  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'border-2 border-gray-800 hover:border-blue-500 text-gray-800 p-2 mb-4 inline-block cursor-pointer', data: { turbo_frame: '_top' } %>
+  <h1 class="text-2xl font-bold mb-4 text-blue-700">Weekly History</h1>
 
   <% @weekly_history.each do |data| %>
-  <div class="bg-white shadow rounded-lg p-6 mb-4">
-    <h2 class="text-xl font-semibold mb-2">Week <%= data[:week_of_year] %> (<%= data[:start_date] ? data[:start_date].strftime('%B %d, %Y') : 'N/A' %> - <%= data[:end_date] ? data[:end_date].strftime('%B %d, %Y') : 'N/A' %>):</h2>
+  <div class="bg-gray-800 shadow rounded-lg p-6 mb-4">
+    <h2 class="text-xl font-semibold mb-2 text-blue-500">Week <%= data[:week_of_year] %> (<%= data[:start_date] ? data[:start_date].strftime('%B %d, %Y') : 'N/A' %> - <%= data[:end_date] ? data[:end_date].strftime('%B %d, %Y') : 'N/A' %>):</h2>
     <p class="mb-1">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
     <p class="mb-1">COGS: <%= number_to_currency(data[:cogs]) %></p>
     <p>Profit: <%= number_to_currency(data[:profit]) %></p>
 
-      <div class="bg-gray-200 p-4 mt-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2">Specific Revenue:</h3>
+      <div class="bg-gray-600 p-4 mt-4 rounded-lg">
+        <h3 class="text-lg font-semibold mb-2 text-blue-500">Specific Revenue:</h3>
         <p class="mb-1">New face to face: <%= number_to_currency(data[:new_face_to_face_revenue]) %></p>
         <p class="mb-1">Return face to face: <%= number_to_currency(data[:return_face_to_face_revenue]) %></p>
         <p>Online: <%= number_to_currency(data[:online_revenue]) %></p>
