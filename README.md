@@ -4,6 +4,7 @@ This is a profit tracking application for a product business. Products can be cr
 
 I will continue improving this over time. The code is currently a bit clunky and could certainly use some re-factoring, but I'll get there in time!
 
+## **OVERVIEW**
 <br>
 
 Products can be created, edited and deleted. 
