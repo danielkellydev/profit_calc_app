@@ -5,6 +5,8 @@ Rails.application.routes.draw do
       get :sales_record
     end
   end
+
+  resources :custom_periods, only: [:index, :new, :create, :show]
   
   resources :products do
     collection do

@@ -1,0 +1,2 @@
+class CustomPeriod < ApplicationRecord
+end

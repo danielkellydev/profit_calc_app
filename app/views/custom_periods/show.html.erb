@@ -1,0 +1,15 @@
+<div class="container mx-auto px-4 text-white">
+  <h1 class="text-2xl font-bold mb-4 text-blue-500"><%= @custom_period.name %></h1>
+  <div class="bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-lg">
+    <p>Start Date: <%= @custom_period.start_date %></p>
+    <p>End Date: <%= @custom_period.end_date %></p>
+    <p>Total Revenue: <%= number_to_currency(@total_revenue) %></p>
+    <p>COGS: <%= number_to_currency(@cogs) %></p>
+    <p>Profit: <%= number_to_currency(@profit) %></p>
+    <h3 class="text-xl font-bold mt-4 text-blue-500">Specific Revenue</h3>
+    <p>New face to face: <%= number_to_currency(@new_face_to_face_revenue) %></p>
+    <p>Return face to face: <%= number_to_currency(@return_face_to_face_revenue) %></p>
+    <p>Online: <%= number_to_currency(@online_revenue) %></p>
+  </div>
+  <%= link_to 'Back to Custom Periods', custom_periods_path, class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
+</div>
