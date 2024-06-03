@@ -1,0 +1,23 @@
+<div class="bg-gray-800 shadow rounded-lg p-6 mb-8 text-white">
+    <h2 class="text-3xl font-bold mb-8">Weekly Sales Record</h2>
+    <%= turbo_frame_tag 'sales_record_frame' do %>
+      <% @sales.sort_by(&:id).reverse.each do |sale| %>
+        <div class="sale-record border border-gray-600 rounded-lg p-4 shadow mb-4 text-white">
+          <h2 class="text-xl font-bold mb-2">Sale ID: <%= sale.id %></h2>
+          <p class="mb-2">Sale Date: <%= sale.sale_date.strftime("%d/%m/%Y") %></p>
+          <p class="mb-2">Products sold:</p>
+          <ul class="list-disc list-inside mb-2">
+            <% sale.sale_items.each do |item| %>
+              <li><%= "#{item.product.name} (#{item.quantity})" %></li>
+            <% end %>
+          </ul>
+          <p class="mb-2">Total Revenue: <%= number_to_currency(sale.total_received) %></p>
+
+          <div class="flex space-x-4">
+            <%= link_to "Edit", edit_sale_path(sale), class: "text-blue-500 underline" %>
+            <%= button_to "Delete", sale_path(sale), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-500 underline" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>

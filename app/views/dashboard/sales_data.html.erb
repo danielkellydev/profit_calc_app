@@ -1,0 +1,9 @@
+<%= turbo_frame_tag 'content_frame' do %>
+<div>
+  <!-- Render the weekly data partial -->
+  <%= render 'dashboard/weekly_data', total_revenue: @total_revenue, cogs: @cogs, profit: @profit, new_face_to_face_revenue: @new_face_to_face_revenue, return_face_to_face_revenue: @return_face_to_face_revenue, online_revenue: @online_revenue %>
+
+  <!-- Render the weekly sales record partial -->
+  <%= render 'sales/weekly_sales_record', sales: @sales %>
+</div>
+<% end %>

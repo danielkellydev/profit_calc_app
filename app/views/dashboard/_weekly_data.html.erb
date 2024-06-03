@@ -1,0 +1,13 @@
+<div class="bg-gray-800 shadow rounded-lg p-6 mb-8 text-white">
+    <p class="mb-2">Week of <%= Date.today.at_beginning_of_week %> to <%= Date.today.at_end_of_week %></p>
+    <p class="mb-2">Total Revenue: <%= number_to_currency(@total_revenue) %></p>
+    <p class="mb-2">COGS: <%= number_to_currency(@cogs) %></p>
+    <p class="mb-4">Profit: <%= number_to_currency(@profit) %></p>
+
+    <h3 class="text-2xl font-bold mb-2">Specific Revenue</h3>
+    <p class="mb-2">New face to face: <%= number_to_currency(@new_face_to_face_revenue) %> </p>
+    <p class="mb-2">Return face to face: <%= number_to_currency(@return_face_to_face_revenue) %> </p>
+    <p class="mb-2">Online: <%= number_to_currency(@online_revenue) %> </p>
+
+    <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "text-blue-500 underline mb-8", data: { turbo_action: 'replace', turbo_frame: 'history_frame' } %>
+  </div>

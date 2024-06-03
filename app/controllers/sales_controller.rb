@@ -1,6 +1,10 @@
 class SalesController < ApplicationController
   before_action :set_weekly_sales, only: [:index]
   
+  def new
+    @products = Product.all
+  end
+  
   def create 
     @sale = Sale.new(sale_params.except(:quantity))
     @sale_date = @sale.sale_date || Date.today

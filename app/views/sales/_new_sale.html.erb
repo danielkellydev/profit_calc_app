@@ -1,0 +1,31 @@
+<div class="bg-gray-800 shadow rounded-lg p-6 mb-8">
+    <h1 class="text-4xl font-bold mb-8 text-white">New Sale</h1>
+    <%= form_with model: Sale.new, url: sales_path, class: 'space-y-8', data: { turbo_frame: "sales_frame" } do |form| %>
+      <div class="grid grid-cols-2 sm:grid-cols-2 gap-2 lg:grid-cols-3 gap-8">
+        <% @products.sort_by(&:name).each do |product| %>
+          <div class="product-card border border-gray-600 rounded-lg p-4 sm:p-6 shadow text-white">
+            <h2 class="text-md font-bold font-bold mb-2"><%= product.name %></h2>
+            <%= form.label "quantity[#{product.id}]", 'Quantity', class: 'block text-sm font-medium text-gray-300' %>
+            <%= form.number_field "quantity[#{product.id}]", min: 0, value: 0, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm' %>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= form.label :sale_date, class: 'block text-sm font-medium text-gray-300' %>
+        <%= form.date_field :sale_date, value: Date.current, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :sale_type, class: 'block text-sm font-medium text-gray-300' %>
+        <%= form.select :sale_type, ['new face to face', 'return face to face', 'online'], {}, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+      </div>
+
+      <div>
+        <%= form.label :total_received, class: 'block text-sm font-medium text-gray-300' %>
+        <%= form.number_field :total_received, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
+      </div>
+
+      <%= form.submit "Record Sale", class: 'mt-8 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
+    <% end %>
+  </div>

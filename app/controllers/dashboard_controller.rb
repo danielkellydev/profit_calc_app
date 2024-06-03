@@ -45,6 +45,12 @@ class DashboardController < ApplicationController
     @weekly_history = @weekly_history.compact.sort_by { |data| [data[:year] || 0, data[:week_of_year] || 0] }.reverse!
   end
 
+  def sales_data
+    set_weekly_data
+    get_specific_revenue
+    @sales = Sale.where(week_of_year: Date.today.cweek, year: Date.today.year)
+  end
+
   private
 
   def set_weekly_data

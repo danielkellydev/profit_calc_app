@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   resources :dashboard, only: [:index], controller: 'dashboard' do
     collection do
       get :weekly_history
-      get :sales_record
+      get :sales_data
     end
   end
 
@@ -14,7 +14,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :sales, only: [:create, :edit, :update, :destroy] 
+  resources :sales, only: [:new, :create, :edit, :update, :destroy] do
+    collection do
+      get :weekly_sales_record
+    end
+  end
 
   root 'dashboard#index'
 end
