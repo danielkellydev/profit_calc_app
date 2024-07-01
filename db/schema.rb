@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_29_063634) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_01_072841) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -27,6 +27,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_29_063634) do
     t.decimal "cogs"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["user_id"], name: "index_products_on_user_id"
   end
 
   create_table "sale_items", force: :cascade do |t|
@@ -41,9 +43,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_29_063634) do
     t.index ["sale_id"], name: "index_sale_items_on_sale_id"
   end
 
+  create_table "sale_types", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_sale_types_on_user_id"
+  end
+
   create_table "sales", force: :cascade do |t|
     t.decimal "total_received"
-    t.string "sale_type"
     t.integer "week_of_year"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -52,10 +61,31 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_29_063634) do
     t.decimal "total_revenue"
     t.integer "year"
     t.date "sale_date"
+    t.bigint "sale_type_id"
+    t.string "old_sale_type"
+    t.bigint "user_id"
     t.index ["product_id"], name: "index_sales_on_product_id"
+    t.index ["sale_type_id"], name: "index_sales_on_sale_type_id"
+    t.index ["user_id"], name: "index_sales_on_user_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  add_foreign_key "products", "users"
   add_foreign_key "sale_items", "products", on_delete: :cascade
   add_foreign_key "sale_items", "sales", on_delete: :nullify
+  add_foreign_key "sale_types", "users"
   add_foreign_key "sales", "products", on_delete: :cascade
+  add_foreign_key "sales", "sale_types"
+  add_foreign_key "sales", "users"
 end

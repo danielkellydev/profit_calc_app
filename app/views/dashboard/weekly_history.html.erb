@@ -1,20 +1,20 @@
-<turbo-frame id="weekly-history" class=" text-white">
-  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'border-2 border-gray-800 hover:border-blue-500 text-gray-800 p-2 mb-4 inline-block cursor-pointer', data: { turbo_frame: '_top' } %>
-  <h1 class="text-2xl font-bold mb-4 text-blue-700">Weekly History</h1>
+<turbo-frame id="content_frame" class="text-gray-800">
+  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-4', data: { turbo_frame: '_top' } %>
+  <h1 class="text-3xl font-semibold mb-6 text-gray-800">Weekly History</h1>
 
   <% @weekly_history.each do |data| %>
-  <div class="bg-gray-800 shadow rounded-lg p-6 mb-4">
-    <h2 class="text-xl font-semibold mb-2 text-blue-500">Week <%= data[:week_of_year] %> (<%= data[:start_date] ? data[:start_date].strftime('%B %d, %Y') : 'N/A' %> - <%= data[:end_date] ? data[:end_date].strftime('%B %d, %Y') : 'N/A' %>):</h2>
-    <p class="mb-1">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
-    <p class="mb-1">COGS: <%= number_to_currency(data[:cogs]) %></p>
-    <p>Profit: <%= number_to_currency(data[:profit]) %></p>
+  <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-3 text-blue-600">Week <%= data[:week_of_year] %> (<%= data[:start_date] ? data[:start_date].strftime('%B %d, %Y') : 'N/A' %> - <%= data[:end_date] ? data[:end_date].strftime('%B %d, %Y') : 'N/A' %>):</h2>
+    <p class="mb-2 text-gray-700">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
+    <p class="mb-2 text-gray-700">COGS: <%= number_to_currency(data[:cogs]) %></p>
+    <p class="mb-4 text-gray-700">Profit: <%= number_to_currency(data[:profit]) %></p>
 
-      <div class="bg-gray-600 p-4 mt-4 rounded-lg">
-        <h3 class="text-lg font-semibold mb-2 text-blue-500">Specific Revenue:</h3>
-        <p class="mb-1">New face to face: <%= number_to_currency(data[:new_face_to_face_revenue]) %></p>
-        <p class="mb-1">Return face to face: <%= number_to_currency(data[:return_face_to_face_revenue]) %></p>
-        <p>Online: <%= number_to_currency(data[:online_revenue]) %></p>
-      </div>
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <h3 class="text-lg font-semibold mb-3 text-blue-600">Specific Revenue:</h3>
+        <% data[:sale_type_revenues].each do |sale_type_revenue| %>
+          <p class="mb-2 text-gray-700"><%= sale_type_revenue[:name] %>: <%= number_to_currency(sale_type_revenue[:revenue]) %></p>
+        <% end %>
     </div>
+  </div>
   <% end %>
 </turbo-frame>

@@ -18,15 +18,27 @@
           <a href="/" class="text-white text-xl font-bold">ProfitCalc</a>
         </div>
         <div class="flex space-x-4">
-          <%= link_to 'Create New Sale', new_sale_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
-          <%= link_to 'Products', edit_all_products_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
-          <%= link_to 'Sales Data', sales_data_dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+          <% if user_signed_in? %>
+            <%= link_to 'Create New Sale', new_sale_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            <%= link_to 'Products', edit_all_products_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            <%= link_to 'Sales Data', sales_data_dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+          <% else %>
+            <%= link_to 'Login', new_user_session_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+            <%= link_to 'Sign Up', new_user_registration_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+          <% end %>
         </div>
       </div>
     </nav>
 
     <main class="mt-8">
       <div class="max-w-7xl mx-auto px-4">
+        <% if notice %>
+          <p class="alert alert-success"><%= notice %></p>
+        <% end %>
+        <% if alert %>
+          <p class="alert alert-danger"><%= alert %></p>
+        <% end %>
         <%= yield %>
       </div>
     </main>

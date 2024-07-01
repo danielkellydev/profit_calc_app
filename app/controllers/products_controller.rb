@@ -1,7 +1,7 @@
 class ProductsController < ApplicationController
 
   def create
-    @product = Product.new(product_params)
+    @product = current_user.products.new(product_params)
     if @product.save
       redirect_to edit_all_products_path
     else
@@ -21,7 +21,7 @@ class ProductsController < ApplicationController
   end
 
   def edit_all
-    @products = Product.all
+    @products = current_user.products.all
   end
 
   def update

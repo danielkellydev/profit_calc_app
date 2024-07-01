@@ -1,13 +1,13 @@
-<div class="bg-gray-800 shadow rounded-lg p-6 mb-8 text-white">
-    <p class="mb-2">Week of <%= Date.today.at_beginning_of_week %> to <%= Date.today.at_end_of_week %></p>
-    <p class="mb-2">Total Revenue: <%= number_to_currency(@total_revenue) %></p>
-    <p class="mb-2">COGS: <%= number_to_currency(@cogs) %></p>
-    <p class="mb-4">Profit: <%= number_to_currency(@profit) %></p>
+<div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+    <p class="mb-2 text-gray-600">Week of <%= Date.today.at_beginning_of_week.strftime('%B %d, %Y') %> to <%= Date.today.at_end_of_week.strftime('%B %d, %Y') %></p>
+    <p class="mb-2 text-gray-800 font-medium">Total Revenue: <%= number_to_currency(@total_revenue) %></p>
+    <p class="mb-2 text-gray-800 font-medium">COGS: <%= number_to_currency(@cogs) %></p>
+    <p class="mb-4 text-gray-800 font-medium">Profit: <%= number_to_currency(@profit) %></p>
 
-    <h3 class="text-2xl font-bold mb-2">Specific Revenue</h3>
-    <p class="mb-2">New face to face: <%= number_to_currency(@new_face_to_face_revenue) %> </p>
-    <p class="mb-2">Return face to face: <%= number_to_currency(@return_face_to_face_revenue) %> </p>
-    <p class="mb-2">Online: <%= number_to_currency(@online_revenue) %> </p>
+    <h3 class="text-xl font-semibold mb-3 text-gray-800">Specific Revenue</h3>
+    <% @sale_type_revenues.each do |sale_type_revenue| %>
+    <p class="mb-2 text-gray-700"><%= sale_type_revenue[:name] %>: <%= number_to_currency(sale_type_revenue[:revenue]) %></p>
+    <% end %>
 
-    <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "text-blue-500 underline mb-8", data: { turbo_action: 'replace', turbo_frame: 'history_frame' } %>
-  </div>
+    <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { turbo_action: 'replace', turbo_frame: 'content_frame' } %>
+</div>

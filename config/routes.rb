@@ -1,18 +1,11 @@
 Rails.application.routes.draw do
-  resources :dashboard, only: [:index], controller: 'dashboard' do
-    collection do
-      get :weekly_history
-      get :sales_data
-    end
+  devise_for :users
+
+  authenticated :user do
+    root 'dashboard#index', as: :authenticated_root
   end
 
-  resources :custom_periods, only: [:index, :new, :create, :show]
-  
-  resources :products do
-    collection do
-      get :edit_all
-    end
-  end
+  root 'home#index'
 
   resources :sales, only: [:new, :create, :edit, :update, :destroy] do
     collection do
@@ -20,5 +13,20 @@ Rails.application.routes.draw do
     end
   end
 
-  root 'dashboard#index'
+  resources :products do
+    collection do
+      get :edit_all
+    end
+  end
+
+  resources :dashboard, only: [:index] do
+    collection do
+      get :sales_data
+      get :weekly_history
+    end
+  end
+
+  resources :sale_types
+
+  get 'home/index'
 end
