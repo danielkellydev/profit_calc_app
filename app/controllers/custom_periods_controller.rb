@@ -40,13 +40,27 @@ class CustomPeriodsController < ApplicationController
     @cogs = @sales.joins(sale_items: :product).sum('sale_items.quantity * products.cogs')
     @profit = @total_revenue - @cogs
 
-    @new_face_to_face_revenue = @sales.joins(:sale_type).where(sale_types: { name: 'new face to face' }).sum(:total_received)
-    @return_face_to_face_revenue = @sales.joins(:sale_type).where(sale_types: { name: 'return face to face' }).sum(:total_received)
-    @online_revenue = @sales.joins(:sale_type).where(sale_types: { name: 'online' }).sum(:total_received)
+    @sale_type_revenues = current_user.sale_types.map do |sale_type|
+      {
+        name: sale_type.name,
+        revenue: @sales.where(sale_type: sale_type).sum(:total_received)
+      }
+    end
 
     respond_to do |format|
       format.html
-      format.turbo_stream { render turbo_stream: turbo_stream.replace('custom', partial: 'custom_periods/show', locals: { custom_period: @custom_period, total_revenue: @total_revenue, cogs: @cogs, profit: @profit, new_face_to_face_revenue: @new_face_to_face_revenue, return_face_to_face_revenue: @return_face_to_face_revenue, online_revenue: @online_revenue }) }
+      format.turbo_stream { 
+        render turbo_stream: turbo_stream.replace('custom', 
+          partial: 'custom_periods/show', 
+          locals: { 
+            custom_period: @custom_period, 
+            total_revenue: @total_revenue, 
+            cogs: @cogs, 
+            profit: @profit, 
+            sale_type_revenues: @sale_type_revenues 
+          }
+        ) 
+      }
     end
   end
 

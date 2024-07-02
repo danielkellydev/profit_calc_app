@@ -1,71 +1,29 @@
 <%= turbo_frame_tag 'content_frame' do %>
-  <div class="mb-4">
-    <div class="border-b border-gray-200">
-      <nav class="-mb-px flex" aria-label="Tabs">
-        <button class="tab-button bg-white inline-block p-4 text-blue-600 border-b-2 border-blue-500 rounded-t-lg active" data-tab="weekly">Weekly</button>
-        <button class="tab-button bg-white inline-block p-4 text-gray-500 hover:text-gray-700 hover:border-gray-300 rounded-t-lg" data-tab="monthly">Monthly</button>
-        <button class="tab-button bg-white inline-block p-4 text-gray-500 hover:text-gray-700 hover:border-gray-300 rounded-t-lg" data-tab="custom">Custom</button>
-      </nav>
+  <div data-controller="tab">
+    <div class="mb-4">
+      <div class="border-b border-gray-200">
+        <nav class="-mb-px flex" aria-label="Tabs">
+          <button data-tab-target="button" data-action="click->tab#switch" data-tab="weekly" class="tab-button bg-white inline-block p-4 text-blue-600 border-b-2 border-blue-500 rounded-t-lg active">Weekly</button>
+          <button data-tab-target="button" data-action="click->tab#switch" data-tab="monthly" class="tab-button bg-white inline-block p-4 text-gray-500 hover:text-gray-700 hover:border-gray-300 rounded-t-lg">Monthly</button>
+          <button data-tab-target="button" data-action="click->tab#switch" data-tab="custom" class="tab-button bg-white inline-block p-4 text-gray-500 hover:text-gray-700 hover:border-gray-300 rounded-t-lg">Custom</button>
+        </nav>
+      </div>
+    </div>
+
+    <div data-tab-target="content" id="weekly" class="tab-content">
+      <%= render 'dashboard/weekly_data', total_revenue: @total_revenue, cogs: @cogs, profit: @profit, new_face_to_face_revenue: @new_face_to_face_revenue, return_face_to_face_revenue: @return_face_to_face_revenue, online_revenue: @online_revenue %>
+      <%= render 'sales/weekly_sales_record', sales: @sales %>
+    </div>
+
+    <div data-tab-target="content" id="monthly" class="tab-content hidden">
+      <%= render 'dashboard/monthly_data', total_revenue: @monthly_total_revenue, cogs: @monthly_cogs, profit: @monthly_profit, sale_type_revenues: @monthly_sale_type_revenues %>
+      <%= render 'sales/monthly_sales_record', sales: @monthly_sales %>
+    </div>
+
+    <div data-tab-target="content" id="custom" class="tab-content hidden">
+      <%= turbo_frame_tag 'custom' do %>
+        <%= render 'custom_periods/index', custom_periods: @custom_periods %>
+      <% end %>
     </div>
   </div>
-
-  <div id="weekly" class="tab-content">
-    <%= render 'dashboard/weekly_data', total_revenue: @total_revenue, cogs: @cogs, profit: @profit, new_face_to_face_revenue: @new_face_to_face_revenue, return_face_to_face_revenue: @return_face_to_face_revenue, online_revenue: @online_revenue %>
-    <%= render 'sales/weekly_sales_record', sales: @sales %>
-  </div>
-
-  <div id="monthly" class="tab-content hidden">
-    <%= render 'dashboard/monthly_data', total_revenue: @monthly_total_revenue, cogs: @monthly_cogs, profit: @monthly_profit, sale_type_revenues: @monthly_sale_type_revenues %>
-    <%= render 'sales/monthly_sales_record', sales: @monthly_sales %>
-  </div>
-
-  <div id="custom" class="tab-content hidden">
-    <%= turbo_frame_tag 'custom' do %>
-      <%= render 'custom_periods/index', custom_periods: @custom_periods %>
-    <% end %>
-  </div>
-<% end %>
-
-<%= javascript_tag nonce: true do %>
-  function initializeTabs() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    if (tabButtons.length === 0 || tabContents.length === 0) {
-      console.warn('Tab buttons or contents not found. Skipping initialization.');
-      return;
-    }
-
-    tabButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const tab = button.dataset.tab;
-        const targetContent = document.getElementById(tab);
-        
-        if (!targetContent) {
-          console.warn(`Tab content for ${tab} not found.`);
-          return;
-        }
-        
-        tabButtons.forEach(btn => btn.classList.remove('text-blue-600', 'border-blue-500', 'active'));
-        tabContents.forEach(content => content.classList.add('hidden'));
-        
-        button.classList.add('text-blue-600', 'border-blue-500', 'active');
-        targetContent.classList.remove('hidden');
-      });
-    });
-  }
-
-  function handleTurboEvents() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeTabs);
-    } else {
-      initializeTabs();
-    }
-  }
-
-  document.addEventListener('turbo:load', handleTurboEvents);
-  document.addEventListener('turbo:render', handleTurboEvents);
-
-  // Initialize on first load
-  handleTurboEvents();
 <% end %>

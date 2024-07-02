@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users
 
   authenticated :user do
-    root 'dashboard#index', as: :authenticated_root
+    root 'sales#new', as: :authenticated_root
   end
 
   root 'home#index'

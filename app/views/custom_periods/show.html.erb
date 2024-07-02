@@ -1,0 +1,9 @@
+<%= turbo_frame_tag 'custom' do %>
+  <%= render partial: 'custom_periods/show', locals: { 
+    custom_period: @custom_period, 
+    total_revenue: @total_revenue, 
+    cogs: @cogs, 
+    profit: @profit, 
+    sale_type_revenues: @sale_type_revenues 
+  } %>
+<% end %>

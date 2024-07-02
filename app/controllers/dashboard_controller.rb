@@ -53,6 +53,32 @@ class DashboardController < ApplicationController
     @weekly_history = @weekly_history.compact.sort_by { |data| [data[:year] || 0, data[:week_of_year] || 0] }.reverse!
   end
 
+  def monthly_history
+    @monthly_history = current_user.sales.group("EXTRACT(MONTH FROM sale_date)", "EXTRACT(YEAR FROM sale_date)")
+                          .select("EXTRACT(MONTH FROM sale_date) as month", 
+                                  "EXTRACT(YEAR FROM sale_date) as year", 
+                                  "SUM(total_received) as total_revenue")
+                          .map do |sale|
+      sales = current_user.sales.where("EXTRACT(MONTH FROM sale_date) = ? AND EXTRACT(YEAR FROM sale_date) = ?", sale.month, sale.year)
+      
+      sale_type_revenues = current_user.sale_types.all.map do |sale_type|
+        {
+          name: sale_type.name,
+          revenue: sales.where(sale_type_id: sale_type.id).sum(:total_received)
+        }
+      end
+
+      cogs = current_user.sale_items.joins(:product, :sale)
+                     .where("EXTRACT(MONTH FROM sales.sale_date) = ? AND EXTRACT(YEAR FROM sales.sale_date) = ?", sale.month, sale.year)
+                     .sum('sale_items.quantity * products.cogs')
+      profit = sale.total_revenue - cogs
+  
+      { month: sale.month.to_i, year: sale.year.to_i, 
+        total_revenue: sale.total_revenue, cogs: cogs, profit: profit, sale_type_revenues: sale_type_revenues }
+    end
+    @monthly_history = @monthly_history.sort_by { |data| [data[:year], data[:month]] }.reverse
+  end
+
   def sales_data
     set_weekly_data
     set_monthly_data

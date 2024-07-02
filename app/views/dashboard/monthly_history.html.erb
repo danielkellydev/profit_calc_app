@@ -1,0 +1,20 @@
+<turbo-frame id="content_frame" class="text-gray-800">
+  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-4', data: { turbo_frame: '_top' } %>
+  <h1 class="text-3xl font-semibold mb-6 text-gray-800">Monthly History</h1>
+
+  <% @monthly_history.each do |data| %>
+  <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-3 text-blue-600"><%= Date::MONTHNAMES[data[:month]] %> <%= data[:year] %></h2>
+    <p class="mb-2 text-gray-700">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
+    <p class="mb-2 text-gray-700">COGS: <%= number_to_currency(data[:cogs]) %></p>
+    <p class="mb-4 text-gray-700">Profit: <%= number_to_currency(data[:profit]) %></p>
+
+    <div class="bg-gray-50 p-4 rounded-lg">
+      <h3 class="text-lg font-semibold mb-3 text-blue-600">Specific Revenue:</h3>
+        <% data[:sale_type_revenues].each do |sale_type_revenue| %>
+          <p class="mb-2 text-gray-700"><%= sale_type_revenue[:name] %>: <%= number_to_currency(sale_type_revenue[:revenue]) %></p>
+        <% end %>
+    </div>
+  </div>
+  <% end %>
+</turbo-frame>
