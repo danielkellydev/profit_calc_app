@@ -1,18 +1,19 @@
-<div class="container mx-auto px-4 max-w-lg text-white">
+<div class="container mx-auto px-4 max-w-lg">
   <h1 class="text-2xl font-bold mb-4 text-blue-500">New Custom Period</h1>
-  <%= form_with model: @custom_period, local: true do |form| %>
+  <%= form_with model: @custom_period, local: true, data: { turbo_frame: 'custom' } do |form| %>
     <div class="mb-4">
-      <%= form.label :name, class: 'block text-white font-bold mb-2' %>
+      <%= form.label :name, class: 'block text-gray-700 font-bold mb-2' %>
       <%= form.text_field :name, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
     </div>
     <div class="mb-4">
-      <%= form.label :start_date, class: 'block text-white font-bold mb-2' %>
+      <%= form.label :start_date, class: 'block text-gray-700 font-bold mb-2' %>
       <%= form.date_field :start_date, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
     </div>
     <div class="mb-4">
-      <%= form.label :end_date, class: 'block text-white font-bold mb-2' %>
+      <%= form.label :end_date, class: 'block text-gray-700 font-bold mb-2' %>
       <%= form.date_field :end_date, class: 'shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline' %>
     </div>
     <%= form.submit 'Create Custom Period', class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
   <% end %>
+  <%= link_to 'Back', custom_periods_path, class: 'mt-4 inline-block bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded', data: { turbo_frame: 'custom' } %>
 </div>

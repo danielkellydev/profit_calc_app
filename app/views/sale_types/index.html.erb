@@ -1,27 +1,23 @@
-<div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-  <h1 class="text-3xl font-semibold mb-8 text-gray-800">Sale Types</h1>
-  
-  <%= link_to 'New Sale Type', new_sale_type_path, class: 'mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
-  
-  <div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-          <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        <% @sale_types.each do |sale_type| %>
+<%= turbo_frame_tag "content_frame" do %>
+  <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+    <h1 class="text-3xl font-semibold mb-8 text-gray-800">Sale Types</h1>
+    
+    <%= link_to 'New Sale Type', new_sale_type_path, class: 'mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
+    
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
           <tr>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= sale_type.name %></td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <%= link_to 'Edit', edit_sale_type_path(sale_type), class: 'text-blue-600 hover:text-blue-900 mr-3' %>
-              <%= button_to 'Delete', sale_type_path(sale_type), method: :delete, data: { confirm: 'Are you sure?' }, class: 'text-red-600 hover:text-red-900 inline' %>
-            </td>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <%= turbo_frame_tag "sale_types" do %>
+            <%= render @sale_types %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+<% end %>

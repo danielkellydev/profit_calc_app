@@ -39,14 +39,19 @@ class SalesController < ApplicationController
   end
 
   def edit
+    @sale = current_user.sales.includes(sale_items: :product).find(params[:id])
   end
 
   def update
     begin
-      if @sale.update(sale_params)
-        redirect_to dashboard_index_path, turbo_frame: 'sales_record_frame', notice: 'Sale was successfully updated.'
-      else
-        render :edit, turbo_frame: 'sales_record_frame', status: :unprocessable_entity
+      Sale.transaction do
+        @sale.assign_attributes(sale_params)
+        update_sale_items
+        if @sale.save
+          redirect_to dashboard_index_path, turbo_frame: 'sales_record_frame', notice: 'Sale was successfully updated.'
+        else
+          render :edit, turbo_frame: 'sales_record_frame', status: :unprocessable_entity
+        end
       end
     rescue => e
       log_error(e)
@@ -58,7 +63,7 @@ class SalesController < ApplicationController
   private
 
   def sale_params
-    params.require(:sale).permit(:sale_type_id, :total_received, :sale_date, quantity: {})
+    params.require(:sale).permit(:sale_type_id, :total_received, :sale_date, quantity: {}, sale_items_attributes: [:id, :product_id, :quantity])
   end
 
   def set_sale_types
@@ -80,6 +85,28 @@ class SalesController < ApplicationController
         @sale.sale_items.create!(product_id: product_id.to_i, quantity: quantity, cogs: product.cogs * quantity.to_i)
       end
     end
+  end
+
+  def update_sale_items
+    return unless params[:sale][:quantity]
+  
+    existing_item_ids = @sale.sale_items.pluck(:id)
+    updated_item_ids = []
+  
+    params[:sale][:quantity].each do |product_id, quantity|
+      product = current_user.products.find_by(id: product_id.to_i)
+      if product && quantity.to_i > 0
+        sale_item = @sale.sale_items.find_or_initialize_by(product_id: product_id.to_i)
+        sale_item.quantity = quantity.to_i
+        sale_item.cogs = product.cogs * quantity.to_i
+        sale_item.save!
+        updated_item_ids << sale_item.id
+      end
+    end
+  
+    # Remove any sale items that weren't in the updated data
+    items_to_remove = existing_item_ids - updated_item_ids
+    @sale.sale_items.where(id: items_to_remove).destroy_all
   end
 
   def log_error(error)

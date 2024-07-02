@@ -8,4 +8,5 @@ class User < ApplicationRecord
   has_many :products 
   has_many :sale_types 
   has_many :sale_items, through: :sales
+  has_many :custom_periods
 end

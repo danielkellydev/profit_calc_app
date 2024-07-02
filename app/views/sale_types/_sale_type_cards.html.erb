@@ -1,0 +1,10 @@
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+  <% @sale_types.each do |sale_type| %>
+    <div class="sale-type-card bg-gray-50 rounded-lg p-4 shadow-sm cursor-pointer"
+         data-action="click->sale#selectSaleType"
+         data-sale-target="saleTypeCard"
+         data-sale-type-id="<%= sale_type.id %>">
+      <h3 class="text-lg font-medium text-gray-700 mb-2"><%= sale_type.name %></h3>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,13 @@
+<div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+    <p class="mb-2 text-gray-600">Month of <%= Date.today.strftime('%B %Y') %></p>
+    <p class="mb-2 text-gray-800 font-medium">Total Revenue: <%= number_to_currency(@monthly_total_revenue) %></p>
+    <p class="mb-2 text-gray-800 font-medium">COGS: <%= number_to_currency(@monthly_cogs) %></p>
+    <p class="mb-4 text-gray-800 font-medium">Profit: <%= number_to_currency(@monthly_profit) %></p>
+
+    <h3 class="text-xl font-semibold mb-3 text-gray-800">Specific Revenue</h3>
+    <% @monthly_sale_type_revenues.each do |sale_type_revenue| %>
+    <p class="mb-2 text-gray-700"><%= sale_type_revenue[:name] %>: <%= number_to_currency(sale_type_revenue[:revenue]) %></p>
+    <% end %>
+
+    <%= link_to "Monthly History", monthly_history_dashboard_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { turbo_action: 'replace', turbo_frame: 'content_frame' } %>
+</div>

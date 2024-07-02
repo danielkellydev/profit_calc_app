@@ -7,7 +7,7 @@ Rails.application.routes.draw do
 
   root 'home#index'
 
-  resources :sales, only: [:new, :create, :edit, :update, :destroy] do
+  resources :sales do
     collection do
       get :weekly_sales_record
     end
@@ -23,10 +23,13 @@ Rails.application.routes.draw do
     collection do
       get :sales_data
       get :weekly_history
+      get :monthly_history
     end
   end
 
   resources :sale_types
+  resources :settings
+  resources :custom_periods
 
   get 'home/index'
 end

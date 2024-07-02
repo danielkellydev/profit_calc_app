@@ -55,8 +55,12 @@ class DashboardController < ApplicationController
 
   def sales_data
     set_weekly_data
+    set_monthly_data
     get_specific_revenue
+    get_monthly_specific_revenue
+    @custom_periods = current_user.custom_periods
     @sales = current_user.sales.where(week_of_year: Date.today.cweek, year: Date.today.year)
+    @monthly_sales = current_user.sales.where(sale_date: Date.today.beginning_of_month..Date.today.end_of_month)
   end
 
   private
@@ -76,5 +80,26 @@ class DashboardController < ApplicationController
       end_date = nil
     end
     [start_date, end_date]
+  end
+
+  def set_monthly_data
+    current_month = Date.today.month
+    current_year = Date.today.year
+    @monthly_sales = current_user.sales.where("EXTRACT(MONTH FROM sale_date) = ? AND EXTRACT(YEAR FROM sale_date) = ?", current_month, current_year)
+    @monthly_total_revenue = @monthly_sales.sum(:total_received)
+    @monthly_cogs = @monthly_sales.joins(sale_items: :product).sum('sale_items.quantity * products.cogs')
+    @monthly_profit = @monthly_total_revenue - @monthly_cogs
+  end
+
+  def get_monthly_specific_revenue
+    current_month = Date.today.month
+    current_year = Date.today.year
+    monthly_sales = current_user.sales.where("EXTRACT(MONTH FROM sale_date) = ? AND EXTRACT(YEAR FROM sale_date) = ?", current_month, current_year)
+    @monthly_sale_type_revenues = current_user.sale_types.all.map do |sale_type|
+      {
+        name: sale_type.name,
+        revenue: monthly_sales.where(sale_type_id: sale_type.id).sum(:total_received)
+      }
+    end
   end
 end
