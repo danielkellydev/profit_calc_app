@@ -1,4 +1,4 @@
-class ResetAllTables < ActiveRecord::Migration[6.0]
+class ResetAllTables2 < ActiveRecord::Migration[6.0]
   def up
     # This will drop all tables and recreate them according to schema.rb
     load(Rails.root.join("db", "schema.rb"))
