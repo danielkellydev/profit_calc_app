@@ -2,7 +2,7 @@
 <div class="container mx-auto px-4 py-8">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold text-gray-900">Expense Categories</h1>
-    <%= link_to "New Category", new_expense_category_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    <%= link_to "New Category", new_expense_category_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded", data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
   </div>
 
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -40,7 +40,7 @@
     <% else %>
       <div class="text-center py-8">
         <p class="text-gray-500 text-lg">No expense categories yet.</p>
-        <%= link_to "Create your first category", new_expense_category_path, class: "mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block" %>
+        <%= link_to "Create your first category", new_expense_category_path, class: "mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block", data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
       </div>
     <% end %>
   </div>
