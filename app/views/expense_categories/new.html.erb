@@ -1,3 +1,4 @@
+<%= turbo_frame_tag 'content_frame' do %>
 <div class="container mx-auto px-4 py-8">
   <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">New Expense Category</h1>
@@ -25,9 +26,10 @@
       </div>
 
       <div class="flex justify-between">
-        <%= link_to "Cancel", expense_categories_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+        <%= link_to "Cancel", expense_categories_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded", data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
         <%= form.submit "Create Category", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
       </div>
     <% end %>
   </div>
 </div>
+<% end %>
