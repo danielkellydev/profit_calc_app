@@ -1,25 +1,29 @@
-<div class="container mx-auto px-4">
-  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'border-2 border-gray-800 hover:border-blue-500 text-gray-800 p-2 mb-4 inline-block cursor-pointer' %>
+<%= turbo_frame_tag 'content_frame' do %>
+<div class="px-4 py-4 sm:py-8">
+  <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+    <h1 class="text-xl sm:text-2xl text-center mb-6 text-gray-800 font-semibold">Add/Edit Products</h1>
 
-  <div class="bg-gray-800 p-6 rounded-lg">
-  <h1 class="text-2xl text-center mb-4 text-white">Edit Products</h1>
+    <%= form_with model: Product.new, url: products_path, data: { turbo_frame: "products_frame" }, html: { class: "space-y-4 sm:space-y-6" } do |form| %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col">
+          <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :name, class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
 
-  <%= form_with model: Product.new, url: products_path, data: { turbo_frame: "products_frame" }, html: { class: "flex flex-col items-center space-y-4" } do |form| %>
-    <div class="flex flex-col">
-      <%= form.label :name, class: "font-bold mb-2 text-white" %>
-      <%= form.text_field :name, class: "border-2 border-gray-300 p-2" %>
-    </div>
+        <div class="flex flex-col">
+          <%= form.label :cogs, "Cost of Goods Sold", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.number_field :cogs, step: 0.01, class: "mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+      </div>
 
-    <div class="flex flex-col">
-      <%= form.label :cogs, class: "font-bold mb-2 text-white" %>
-      <%= form.number_field :cogs, class: "border-2 border-gray-300 p-2" %>
-    </div>
-
-    <%= form.submit "Add product", class: "border-2 border-white hover:border-blue-500 text-white p-2 cursor-pointer" %>
-  <% end %>
+      <%= form.submit "Add Product", class: "w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    <% end %>
   </div>
 
   <%= turbo_frame_tag 'products_frame' do %>
-    <%= render @products %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 sm:mt-8 max-w-6xl mx-auto">
+      <%= render @products %>
+    </div>
   <% end %>
 </div>
+<% end %>

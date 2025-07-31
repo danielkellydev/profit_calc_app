@@ -1,12 +1,12 @@
-<div class="max-w-md mx-auto bg-gray-800  rounded-lg shadow-md overflow-hidden md:max-w-2xl m-4 text-white">
-  <div class="md:flex">
-    <div class="p-8">
-      <div class="uppercase tracking-wide text-sm text-blue-500 font-semibold">Product</div>
-      <h2 class="block mt-1 text-lg leading-tight font-medium"><%= product.name %></h2>
-      <p class="mt-2">Cost of Goods Sold: <%= number_to_currency(product.cogs) %></p>
-      <%= link_to 'Edit', edit_product_path(product), class: "mt-4 inline-block border-2 border-white hover:border-blue-500 text-white font-bold py-2 px-4" %>
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+  <div class="p-4 sm:p-6">
+    <div class="text-sm text-blue-600 font-medium mb-1">Product</div>
+    <h2 class="text-lg sm:text-xl text-gray-800 font-semibold mb-2"><%= product.name %></h2>
+    <p class="text-gray-600 mb-4 text-sm sm:text-base">COGS: <%= number_to_currency(product.cogs) %></p>
+    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <%= link_to 'Edit', edit_product_path(product), class: "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
       <%= form_with url: product_path(product), method: :delete, class: "inline" do %>
-        <%= submit_tag 'Delete', data: { confirm: 'Are you sure?' }, class: "mt-4 inline-block border-2 border-white hover:border-red-500 text-white font-bold py-2 px-4 cursor-pointer" %>
+        <%= submit_tag 'Delete', data: { confirm: 'Are you sure?' }, class: "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer w-full sm:w-auto" %>
       <% end %>
     </div>
   </div>

@@ -1,0 +1,13 @@
+<%= turbo_frame_tag sale_type do %>
+  <tr>
+    <td colspan="2" class="px-6 py-4">
+      <%= form_with(model: sale_type, local: true) do |form| %>
+        <div class="flex items-center">
+          <%= form.text_field :name, class: 'mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md mr-2' %>
+          <%= form.submit 'Save', class: 'inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
+          <%= link_to 'Cancel', sale_types_path, class: 'ml-2 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
+        </div>
+      <% end %>
+    </td>
+  </tr>
+<% end %>

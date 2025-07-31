@@ -1,0 +1,24 @@
+<div class="container mx-auto px-4">
+  <h1 class="text-2xl font-bold mb-4 text-blue-500">Custom Periods</h1>
+  <%= link_to 'New Custom Period', new_custom_period_path, class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded', data: { turbo_frame: 'custom' } %>
+  <div class="mt-4">
+    <% if custom_periods.present? %>
+      <% custom_periods.each do |custom_period| %>
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 mt-10 max-w-lg">
+          <h2 class="text-lg font-bold mb-2 text-blue-500"><%= custom_period.name %></h2>
+          <div class="mb-4">
+            <p>Start Date: <%= custom_period.start_date.strftime('%B %d, %Y') %></p>
+            <p>End Date: <%= custom_period.end_date.strftime('%B %d, %Y') %></p>
+          </div>
+          <div>
+            <%= link_to 'View Details', custom_period_path(custom_period), class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded', data: { turbo_frame: 'custom' } %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="bg-white shadow-md rounded px-8 py-6 mt-4">
+        <p class="text-gray-600">No custom periods found. Create one to get started!</p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<%= turbo_frame_tag 'content_frame' do %>
+  <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+    <h2 class="text-3xl font-semibold mb-8 text-gray-800">Weekly Sales Record</h2>
+    <%= turbo_frame_tag 'sales_record_frame' do %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <% @sales.sort_by(&:id).reverse.each do |sale| %>
+          <div class="sale-record bg-gray-50 rounded-lg p-4 shadow-sm">
+            <h3 class="text-lg font-medium mb-2 text-gray-700">Sale #<%= sale.id %></h3>
+            <p class="text-sm text-gray-600 mb-2"><%= sale.sale_date.strftime("%d/%m/%Y") %></p>
+            <p class="text-sm text-gray-600 mb-1">Products:</p>
+            <ul class="list-disc list-inside mb-2 text-xs text-gray-600">
+              <% sale.sale_items.each do |item| %>
+                <li><%= "#{item.product.name} (#{item.quantity})" %></li>
+              <% end %>
+            </ul>
+            <p class="text-sm font-medium text-gray-700 mb-2">Total: <%= number_to_currency(sale.total_received) %></p>
+            <div class="flex justify-between text-xs">
+              <%= link_to "Edit", edit_sale_path(sale), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+              <%= button_to "Delete", sale_path(sale), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 font-medium" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

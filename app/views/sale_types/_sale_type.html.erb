@@ -1,0 +1,9 @@
+<%= turbo_frame_tag sale_type do %>
+  <tr>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= sale_type.name %></td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+      <%= link_to 'Edit', edit_sale_type_path(sale_type), class: 'text-blue-600 hover:text-blue-900 mr-3' %>
+      <%= button_to 'Delete', sale_type_path(sale_type), method: :delete, data: { confirm: 'Are you sure?' }, class: 'text-red-600 hover:text-red-900 inline' %>
+    </td>
+  </tr>
+<% end %>

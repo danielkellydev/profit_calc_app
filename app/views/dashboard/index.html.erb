@@ -1,78 +1,8 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
-  <%= link_to "Edit Products", edit_all_products_path, class: "text-blue-500 underline mb-8", data: { turbo_action: 'replace', turbo_frame: 'products_frame' } %>
-  <div class="bg-gray-800 shadow rounded-lg p-6 mb-8">
-    <h1 class="text-4xl font-bold mb-8 text-white">New Sale</h1>
-    <%= form_with model: Sale.new, url: sales_path, class: 'space-y-8', data: { turbo_frame: "sales_frame" } do |form| %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <% @products.sort_by(&:name).each do |product| %>
-          <div class="product-card border border-gray-600 rounded-lg p-4 sm:p-6 shadow text-white">
-            <h2 class="text-lg sm:text-xl font-bold mb-2"><%= product.name %></h2>
-            <%= form.label "quantity[#{product.id}]", 'Quantity', class: 'block text-sm font-medium text-gray-300' %>
-            <%= form.number_field "quantity[#{product.id}]", min: 0, value: 0, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm' %>
-          </div>
-        <% end %>
-      </div>
+<div>
 
-      <div>
-        <%= form.label :sale_date, class: 'block text-sm font-medium text-gray-300' %>
-        <%= form.date_field :sale_date, value: Date.current, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
-      </div>
-
-      <div>
-        <%= form.label :sale_type, class: 'block text-sm font-medium text-gray-300' %>
-        <%= form.select :sale_type, ['new face to face', 'return face to face', 'online'], {}, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
-      </div>
-
-      <div>
-        <%= form.label :total_received, class: 'block text-sm font-medium text-gray-300' %>
-        <%= form.number_field :total_received, class: 'mt-1 block w-full py-2 px-3 border border-gray-600 bg-gray-700 rounded-none shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm' %>
-      </div>
-
-      <%= form.submit "Record Sale", class: 'mt-8 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
-    <% end %>
-  </div>
-  <%= link_to 'Custom Periods', custom_periods_path, class: 'inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium max-w-md rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
-</div>
-
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold mb-8 text-gray-800">Weekly Data</h1>
-
-  <div class="bg-gray-800 shadow rounded-lg p-6 mb-8 text-white">
-    <p class="mb-2">Week of <%= Date.today.at_beginning_of_week %> to <%= Date.today.at_end_of_week %></p>
-    <p class="mb-2">Total Revenue: <%= number_to_currency(@total_revenue) %></p>
-    <p class="mb-2">COGS: <%= number_to_currency(@cogs) %></p>
-    <p class="mb-4">Profit: <%= number_to_currency(@profit) %></p>
-
-    <h3 class="text-2xl font-bold mb-2">Specific Revenue</h3>
-    <p class="mb-2">New face to face: <%= number_to_currency(@new_face_to_face_revenue) %> </p>
-    <p class="mb-2">Return face to face: <%= number_to_currency(@return_face_to_face_revenue) %> </p>
-    <p class="mb-2">Online: <%= number_to_currency(@online_revenue) %> </p>
-
-    <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "text-blue-500 underline mb-8", data: { turbo_action: 'replace', turbo_frame: 'history_frame' } %>
-  </div>
-
-  <div class="bg-gray-800 shadow rounded-lg p-6 mb-8 text-white">
-    <h2 class="text-3xl font-bold mb-8">Weekly Sales Record</h2>
-    <%= turbo_frame_tag 'sales_record_frame' do %>
-      <% @sales.sort_by(&:id).reverse.each do |sale| %>
-        <div class="sale-record border border-gray-600 rounded-lg p-4 shadow mb-4 text-white">
-          <h2 class="text-xl font-bold mb-2">Sale ID: <%= sale.id %></h2>
-          <p class="mb-2">Sale Date: <%= sale.sale_date.strftime("%d/%m/%Y") %></p>
-          <p class="mb-2">Products sold:</p>
-          <ul class="list-disc list-inside mb-2">
-            <% sale.sale_items.each do |item| %>
-              <li><%= "#{item.product.name} (#{item.quantity})" %></li>
-            <% end %>
-          </ul>
-          <p class="mb-2">Total Revenue: <%= number_to_currency(sale.total_received) %></p>
-
-          <div class="flex space-x-4">
-            <%= link_to "Edit", edit_sale_path(sale), class: "text-blue-500 underline" %>
-            <%= button_to "Delete", sale_path(sale), method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-500 underline" %>
-          </div>
-        </div>
-      <% end %>
-    <% end %>
-  </div>
+  <!-- Turbo Frame for rendering the content -->
+  <%= turbo_frame_tag 'content_frame' do %>
+    <%= render 'dashboard/weekly_data', total_revenue: @total_revenue, cogs: @cogs, profit: @profit, new_face_to_face_revenue: @new_face_to_face_revenue, return_face_to_face_revenue: @return_face_to_face_revenue, online_revenue: @online_revenue %>
+    <%= render 'sales/weekly_sales_record', sales: @sales %>
+  <% end %>
 </div>

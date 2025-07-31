@@ -1,0 +1,45 @@
+<div class="bg-white shadow-lg rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-3xl font-semibold mb-6 sm:mb-8 text-gray-800">New Sale</h1>
+    <%= form_with model: Sale.new, url: sales_path, class: 'space-y-6', data: { turbo_frame: "sales_frame", controller: "sale" } do |form| %>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <% @products.sort_by(&:name).each do |product| %>
+          <div class="product-card bg-gray-50 rounded-lg p-3 shadow-sm relative">
+            <button type="button" 
+                    class="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors"
+                    data-action="click->sale#incrementProduct"
+                    data-product-id="<%= product.id %>">
+              <h3 class="text-sm font-medium text-gray-700 text-center mb-2"><%= product.name %></h3>
+              <span id="quantity_display_<%= product.id %>" class="text-2xl font-bold text-blue-600">0</span>
+            </button>
+            <button type="button"
+                    class="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                    data-action="click->sale#decrementProduct"
+                    data-product-id="<%= product.id %>">
+              -
+            </button>
+            <%= form.hidden_field "quantity[#{product.id}]", id: "quantity_#{product.id}", value: 0 %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <%= form.label :sale_date, class: 'block text-sm font-medium text-gray-700' %>
+          <%= form.date_field :sale_date, value: Date.current, class: 'mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+
+        <div>
+          <%= form.label :total_received, class: 'block text-sm font-medium text-gray-700' %>
+          <%= form.number_field :total_received, step: 0.01, class: 'mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.label :sale_type_id, 'Sale Type', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+        <%= render partial: 'sale_types/sale_type_cards' %>
+        <%= form.hidden_field :sale_type_id, data: { sale_target: "saleTypeInput" } %>
+      </div>
+
+      <%= form.submit "Record Sale", class: 'mt-6 w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
+    <% end %>
+  </div>
