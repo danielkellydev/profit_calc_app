@@ -13,35 +13,71 @@
 
   <body>
 <nav class="bg-gray-800 w-full">
-  <div class="flex items-center justify-between h-16 px-4">
-    <div class="flex items-center">
-      <a href="/" class="text-white text-xl font-bold">ProfitCalc</a>
-    </div>
-    <div class="flex space-x-4">
-      <% if user_signed_in? %>
-        <%= link_to 'Create New Sale', new_sale_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
-        <%= link_to 'Products', edit_all_products_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
-        <%= link_to 'Sales Data', sales_data_dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center">
+        <a href="/" class="text-white text-xl font-bold">ProfitCalc</a>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden md:block">
+        <div class="ml-10 flex items-baseline space-x-4">
+          <% if user_signed_in? %>
+            <%= link_to 'New Sale', new_sale_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            <%= link_to 'Products', edit_all_products_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            <%= link_to 'Expenses', expenses_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+            <%= link_to 'Business Overview', overview_dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            <%= link_to 'Sales Data', sales_data_dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+            
+            <div class="relative" data-controller="dropdown">
+              <button data-action="click->dropdown#toggle" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                Menu
+              </button>
+              <div data-dropdown-target="menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                <%= link_to 'Settings', settings_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+                <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
+              </div>
+            </div>
+          <% else %>
+            <%= link_to 'Login', new_user_session_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+            <%= link_to 'Sign Up', new_user_registration_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="md:hidden relative" data-controller="dropdown">
+        <button data-action="click->dropdown#toggle" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+          <span class="sr-only">Open main menu</span>
+          <!-- Hamburger icon -->
+          <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
         
-        <div class="relative" data-controller="dropdown">
-          <button data-action="click->dropdown#toggle" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-            Menu
-          </button>
-          <div data-dropdown-target="menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
-            <%= link_to 'Settings', settings_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
-            <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
+        <!-- Mobile menu -->
+        <div class="hidden absolute right-0 top-full mt-2 w-56 z-50" data-dropdown-target="menu">
+          <div class="px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-md shadow-lg">
+            <% if user_signed_in? %>
+              <%= link_to 'New Sale', new_sale_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+              <%= link_to 'Products', edit_all_products_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+              <%= link_to 'Expenses', expenses_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
+              <%= link_to 'Sales Data', sales_data_dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+              <%= link_to 'Settings', settings_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+              <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium' %>
+            <% else %>
+              <%= link_to 'Login', new_user_session_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
+              <%= link_to 'Sign Up', new_user_registration_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
+            <% end %>
           </div>
         </div>
-      <% else %>
-        <%= link_to 'Login', new_user_session_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
-        <%= link_to 'Sign Up', new_user_registration_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
-      <% end %>
+      </div>
     </div>
   </div>
 </nav>
 
-    <main class="mt-8">
-      <div class="max-w-7xl mx-auto px-4">
+    <main class="mt-4 sm:mt-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <% if notice %>
           <p class="alert alert-success"><%= notice %></p>
         <% end %>

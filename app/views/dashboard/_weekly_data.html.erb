@@ -1,13 +1,46 @@
-<div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-    <p class="mb-2 text-gray-600">Week of <%= Date.today.at_beginning_of_week.strftime('%B %d, %Y') %> to <%= Date.today.at_end_of_week.strftime('%B %d, %Y') %></p>
-    <p class="mb-2 text-gray-800 font-medium">Total Revenue: <%= number_to_currency(@total_revenue) %></p>
-    <p class="mb-2 text-gray-800 font-medium">COGS: <%= number_to_currency(@cogs) %></p>
-    <p class="mb-4 text-gray-800 font-medium">Profit: <%= number_to_currency(@profit) %></p>
+<div class="bg-white shadow-lg rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+    <p class="mb-4 text-gray-600 text-sm sm:text-base">Week of <%= Date.today.at_beginning_of_week.strftime('%B %d, %Y') %> to <%= Date.today.at_end_of_week.strftime('%B %d, %Y') %></p>
+    
+    <!-- Financial Summary Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">Total Revenue</p>
+        <p class="text-lg sm:text-xl font-bold text-gray-900"><%= number_to_currency(@total_revenue) %></p>
+        <p class="text-xs text-gray-500 mt-1">12-week avg: <%= number_to_currency(@weekly_avg_revenue) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">COGS</p>
+        <p class="text-lg sm:text-xl font-bold text-gray-900"><%= number_to_currency(@cogs) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">Gross Profit</p>
+        <p class="text-lg sm:text-xl font-bold text-gray-900"><%= number_to_currency(@profit) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">Weekly Expenses</p>
+        <p class="text-lg sm:text-xl font-bold text-gray-900"><%= number_to_currency(@weekly_expenses) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg sm:col-span-2 lg:col-span-2">
+        <p class="text-sm text-gray-600">Net Profit</p>
+        <p class="text-xl sm:text-2xl font-bold <%= @net_profit >= 0 ? 'text-green-600' : 'text-red-600' %>"><%= number_to_currency(@net_profit) %></p>
+        <p class="text-xs text-gray-500 mt-1">12-week avg: <%= number_to_currency(@weekly_avg_profit) %></p>
+      </div>
+    </div>
 
-    <h3 class="text-xl font-semibold mb-3 text-gray-800">Specific Revenue</h3>
-    <% @sale_type_revenues.each do |sale_type_revenue| %>
-    <p class="mb-2 text-gray-700"><%= sale_type_revenue[:name] %>: <%= number_to_currency(sale_type_revenue[:revenue]) %></p>
-    <% end %>
+    <div class="border-t pt-4">
+      <h3 class="text-lg sm:text-xl font-semibold mb-3 text-gray-800">Revenue by Type</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <% @sale_type_revenues.each do |sale_type_revenue| %>
+        <div class="flex justify-between py-1">
+          <span class="text-gray-700 text-sm sm:text-base"><%= sale_type_revenue[:name] %>:</span>
+          <span class="font-medium text-sm sm:text-base"><%= number_to_currency(sale_type_revenue[:revenue]) %></span>
+        </div>
+        <% end %>
+      </div>
+    </div>
 
-    <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { turbo_action: 'replace', turbo_frame: 'content_frame' } %>
+    <div class="flex flex-col sm:flex-row gap-3 mt-6">
+      <%= link_to "Weekly History", weekly_history_dashboard_index_path, class: "inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { turbo_action: 'replace', turbo_frame: 'content_frame' } %>
+      <%= link_to "Manage Expenses", expenses_path, class: "inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+    </div>
 </div>

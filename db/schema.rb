@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_11_055931) do
+ActiveRecord::Schema[7.0].define(version: 2025_07_31_061259) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,32 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_11_055931) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["user_id"], name: "index_custom_periods_on_user_id"
+  end
+
+  create_table "expense_categories", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_expense_categories_on_user_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.string "name", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.string "frequency", null: false
+    t.date "start_date"
+    t.date "end_date"
+    t.boolean "active", default: true
+    t.bigint "expense_category_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_expenses_on_active"
+    t.index ["expense_category_id"], name: "index_expenses_on_expense_category_id"
+    t.index ["frequency"], name: "index_expenses_on_frequency"
+    t.index ["user_id"], name: "index_expenses_on_user_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -84,6 +110,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_11_055931) do
   end
 
   add_foreign_key "custom_periods", "users"
+  add_foreign_key "expense_categories", "users"
+  add_foreign_key "expenses", "expense_categories"
+  add_foreign_key "expenses", "users"
   add_foreign_key "products", "users"
   add_foreign_key "sale_items", "products", on_delete: :cascade
   add_foreign_key "sale_items", "sales", on_delete: :nullify

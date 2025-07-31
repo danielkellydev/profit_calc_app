@@ -1,0 +1,188 @@
+<turbo-frame id="content_frame" class="text-gray-800">
+  <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-6', data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+  
+  <div class="mb-8">
+    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Business Overview</h1>
+    <p class="text-gray-600">Comprehensive analysis of your business performance</p>
+  </div>
+
+  <!-- Key Performance Indicators -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+      <h3 class="text-sm font-medium opacity-90">Monthly Avg Revenue</h3>
+      <p class="text-2xl font-bold"><%= number_to_currency(@monthly_avg_revenue) %></p>
+      <p class="text-xs opacity-75 mt-1">Last 12 months</p>
+    </div>
+    
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
+      <h3 class="text-sm font-medium opacity-90">Monthly Avg Profit</h3>
+      <p class="text-2xl font-bold"><%= number_to_currency(@monthly_avg_profit) %></p>
+      <p class="text-xs opacity-75 mt-1">After all expenses</p>
+    </div>
+    
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
+      <h3 class="text-sm font-medium opacity-90">Profit Margin</h3>
+      <p class="text-2xl font-bold"><%= @profit_margin %>%</p>
+      <p class="text-xs opacity-75 mt-1">Net profit margin</p>
+    </div>
+    
+    <div class="bg-gradient-to-r from-<%= @revenue_growth >= 0 ? 'green' : 'red' %>-500 to-<%= @revenue_growth >= 0 ? 'green' : 'red' %>-600 rounded-lg p-6 text-white">
+      <h3 class="text-sm font-medium opacity-90">Growth Rate</h3>
+      <p class="text-2xl font-bold"><%= @revenue_growth >= 0 ? '+' : '' %><%= @revenue_growth %>%</p>
+      <p class="text-xs opacity-75 mt-1">Revenue growth</p>
+    </div>
+  </div>
+
+  <!-- Business Health Metrics -->
+  <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Business Health</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center p-4 bg-gray-50 rounded-lg">
+        <h4 class="text-sm font-medium text-gray-600 mb-2">Expense Ratio</h4>
+        <div class="relative w-24 h-24 mx-auto mb-2">
+          <svg class="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+            <circle cx="50" cy="50" r="40" stroke="<%= @expense_ratio > 50 ? '#ef4444' : @expense_ratio > 30 ? '#f59e0b' : '#10b981' %>" 
+                    stroke-width="8" fill="none" stroke-dasharray="<%= (@expense_ratio * 2.51).round(2) %> 251.2" 
+                    stroke-linecap="round"/>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-lg font-bold text-gray-900"><%= @expense_ratio %>%</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-500">Of revenue goes to expenses</p>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-sm font-medium text-gray-600 mb-2">Weekly Performance</h4>
+          <p class="text-lg font-semibold text-gray-900">Avg Revenue: <%= number_to_currency(@weekly_avg_revenue) %></p>
+          <p class="text-lg font-semibold text-gray-900">Avg Profit: <%= number_to_currency(@weekly_avg_profit) %></p>
+        </div>
+      </div>
+      
+      <div>
+        <h4 class="text-sm font-medium text-gray-600 mb-2">Best Performing Month</h4>
+        <p class="text-xl font-bold text-green-600"><%= @best_month || 'No data yet' %></p>
+        <p class="text-xs text-gray-500 mt-1">Highest net profit</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue & Expense Breakdown -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Sales by Type -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h3 class="text-xl font-semibold text-gray-900 mb-4">Revenue by Sale Type</h3>
+      <% if @sales_by_type.any? %>
+        <div class="space-y-3">
+          <% @sales_by_type.each do |type| %>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full bg-blue-<%= [500, 400, 300, 200][@sales_by_type.index(type) % 4] %> mr-3"></div>
+                <span class="text-sm font-medium text-gray-700"><%= type[:name] %></span>
+              </div>
+              <div class="text-right">
+                <span class="text-sm font-bold text-gray-900"><%= type[:percentage] %>%</span>
+                <p class="text-xs text-gray-500"><%= number_to_currency(type[:revenue]) %></p>
+              </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-<%= [500, 400, 300, 200][@sales_by_type.index(type) % 4] %> h-2 rounded-full" style="width: <%= type[:percentage] %>%"></div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500">No sales data available</p>
+      <% end %>
+    </div>
+
+    <!-- Expenses Breakdown -->
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h3 class="text-xl font-semibold text-gray-900 mb-4">Expenses by Category</h3>
+      <% if @expense_breakdown.any? %>
+        <div class="space-y-3">
+          <% @expense_breakdown.each do |expense| %>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full bg-red-<%= [500, 400, 300, 200][@expense_breakdown.index(expense) % 4] %> mr-3"></div>
+                <span class="text-sm font-medium text-gray-700"><%= expense[:name] %></span>
+              </div>
+              <div class="text-right">
+                <span class="text-sm font-bold text-gray-900"><%= expense[:percentage] %>%</span>
+                <p class="text-xs text-gray-500"><%= number_to_currency(expense[:amount]) %></p>
+              </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-red-<%= [500, 400, 300, 200][@expense_breakdown.index(expense) % 4] %> h-2 rounded-full" style="width: <%= expense[:percentage] %>%"></div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500">No expense data available</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Recent Trends -->
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">6-Month Trend</h3>
+    <% if @recent_monthly_data.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-medium text-gray-600">Month</th>
+              <th class="text-right py-3 px-4 font-medium text-gray-600">Revenue</th>
+              <th class="text-right py-3 px-4 font-medium text-gray-600">Net Profit</th>
+              <th class="text-right py-3 px-4 font-medium text-gray-600">Margin</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @recent_monthly_data.each do |data| %>
+              <tr class="hover:bg-gray-50">
+                <td class="py-3 px-4 font-medium text-gray-900"><%= data[:month] %> <%= data[:year] %></td>
+                <td class="py-3 px-4 text-right text-gray-900"><%= number_to_currency(data[:revenue]) %></td>
+                <td class="py-3 px-4 text-right font-medium <%= data[:profit] >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                  <%= number_to_currency(data[:profit]) %>
+                </td>
+                <td class="py-3 px-4 text-right text-gray-600">
+                  <%= data[:revenue] > 0 ? ((data[:profit] / data[:revenue]) * 100).round(1) : 0 %>%
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-gray-500">No recent data available</p>
+    <% end %>
+  </div>
+
+  <!-- Action Items & Insights -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
+    <h3 class="text-lg font-semibold text-blue-900 mb-3">💡 Business Insights</h3>
+    <div class="space-y-2 text-sm text-blue-800">
+      <% if @profit_margin < 10 %>
+        <p>• Your profit margin (<%= @profit_margin %>%) is relatively low. Consider reviewing your pricing or reducing expenses.</p>
+      <% elsif @profit_margin > 25 %>
+        <p>• Excellent profit margin (<%= @profit_margin %>%)! Your business is highly profitable.</p>
+      <% end %>
+      
+      <% if @expense_ratio > 50 %>
+        <p>• Expenses account for <%= @expense_ratio %>% of revenue. Consider cost optimization opportunities.</p>
+      <% end %>
+      
+      <% if @revenue_growth < 0 %>
+        <p>• Revenue is declining (<%= @revenue_growth %>%). Focus on marketing and customer retention.</p>
+      <% elsif @revenue_growth > 10 %>
+        <p>• Strong revenue growth (<%= @revenue_growth %>%)! Consider scaling your operations.</p>
+      <% end %>
+      
+      <% if @sales_by_type.any? && @sales_by_type.first[:percentage] > 60 %>
+        <p>• <%= @sales_by_type.first[:percentage] %>% of revenue comes from '<%= @sales_by_type.first[:name] %>'. Consider diversifying your revenue streams.</p>
+      <% end %>
+    </div>
+  </div>
+</turbo-frame>

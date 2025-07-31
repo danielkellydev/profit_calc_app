@@ -1,0 +1,129 @@
+<%= turbo_frame_tag 'content_frame' do %>
+<div class="container mx-auto px-4 py-4 sm:py-8">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Expenses</h1>
+    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+      <%= link_to "Manage Categories", expense_categories_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded text-center", data: { turbo_frame: 'content_frame', turbo_action: 'replace' } %>
+      <%= link_to "New Expense", new_expense_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center" %>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+    <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6">
+      <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Weekly Total</h3>
+      <p class="text-xl sm:text-2xl font-bold text-green-600"><%= number_to_currency(@total_weekly_expenses) %></p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6">
+      <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Monthly Total</h3>
+      <p class="text-xl sm:text-2xl font-bold text-blue-600"><%= number_to_currency(@total_monthly_expenses) %></p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6">
+      <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Annual Total</h3>
+      <p class="text-xl sm:text-2xl font-bold text-purple-600"><%= number_to_currency(@total_annual_expenses) %></p>
+    </div>
+  </div>
+
+  <!-- Expenses by Category -->
+  <% if @expenses_by_category.any? %>
+    <% @expenses_by_category.each do |category, expenses| %>
+      <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
+        <div class="bg-gray-50 px-4 sm:px-6 py-4 border-b">
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-900"><%= category.name %></h2>
+          <% if category.description.present? %>
+            <p class="text-sm text-gray-600 mt-1"><%= category.description %></p>
+          <% end %>
+        </div>
+        
+        <!-- Mobile Card View -->
+        <div class="block sm:hidden">
+          <% expenses.each do |expense| %>
+            <div class="border-b border-gray-200 p-4 <%= 'opacity-50' unless expense.active %>">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-medium text-gray-900"><%= expense.name %></h3>
+                <% if expense.active %>
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                <% else %>
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Inactive</span>
+                <% end %>
+              </div>
+              <div class="text-sm text-gray-600 space-y-1">
+                <div class="flex justify-between">
+                  <span>Amount:</span>
+                  <span class="font-medium"><%= number_to_currency(expense.amount) %></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Frequency:</span>
+                  <span><%= expense.frequency.capitalize %></span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Weekly Equiv:</span>
+                  <span class="font-medium"><%= number_to_currency(expense.weekly_amount) %></span>
+                </div>
+              </div>
+              <div class="flex space-x-4 mt-3 pt-3 border-t border-gray-100">
+                <%= link_to "Edit", edit_expense_path(expense), class: "text-indigo-600 hover:text-indigo-900 text-sm font-medium" %>
+                <%= link_to "Delete", expense_path(expense), method: :delete,
+                    confirm: "Are you sure?", class: "text-red-600 hover:text-red-900 text-sm font-medium" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Desktop Table View -->
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Frequency</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Weekly Equiv.</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% expenses.each do |expense| %>
+                <tr class="<%= 'opacity-50' unless expense.active %>">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <%= expense.name %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= number_to_currency(expense.amount) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <%= expense.frequency.capitalize %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <%= number_to_currency(expense.weekly_amount) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if expense.active %>
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                    <% else %>
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Inactive</span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <%= link_to "Edit", edit_expense_path(expense), class: "text-indigo-600 hover:text-indigo-900 mr-4" %>
+                    <%= link_to "Delete", expense_path(expense), method: :delete,
+                        confirm: "Are you sure?", class: "text-red-600 hover:text-red-900" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-white shadow-md rounded-lg p-8 text-center">
+      <p class="text-gray-500 text-lg mb-4">No expenses tracked yet.</p>
+      <p class="text-gray-400 mb-4">Start by creating some expense categories, then add your regular expenses.</p>
+      <%= link_to "Create Categories", expense_categories_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-4" %>
+      <%= link_to "Add Expense", new_expense_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  <% end %>
+</div>
+<% end %>

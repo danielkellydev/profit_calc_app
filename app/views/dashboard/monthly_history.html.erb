@@ -1,19 +1,48 @@
 <turbo-frame id="content_frame" class="text-gray-800">
   <%= link_to 'Back to Dashboard', dashboard_index_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mb-4', data: { turbo_frame: '_top' } %>
-  <h1 class="text-3xl font-semibold mb-6 text-gray-800">Monthly History</h1>
+  
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+    <h1 class="text-2xl sm:text-3xl font-semibold text-gray-800">Monthly History</h1>
+    <div class="bg-blue-50 p-3 rounded-lg mt-4 sm:mt-0">
+      <p class="text-sm text-blue-600">12-Month Averages</p>
+      <p class="text-sm font-medium">Revenue: <%= number_to_currency(current_user.monthly_average_revenue) %></p>
+      <p class="text-sm font-medium">Net Profit: <%= number_to_currency(current_user.monthly_average_profit) %></p>
+    </div>
+  </div>
 
   <% @monthly_history.each do |data| %>
-  <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
-    <h2 class="text-xl font-semibold mb-3 text-blue-600"><%= Date::MONTHNAMES[data[:month]] %> <%= data[:year] %></h2>
-    <p class="mb-2 text-gray-700">Total Revenue: <%= number_to_currency(data[:total_revenue]) %></p>
-    <p class="mb-2 text-gray-700">COGS: <%= number_to_currency(data[:cogs]) %></p>
-    <p class="mb-4 text-gray-700">Profit: <%= number_to_currency(data[:profit]) %></p>
+  <div class="bg-white shadow-lg rounded-lg p-4 sm:p-6 mb-6">
+    <h2 class="text-lg sm:text-xl font-semibold mb-3 text-blue-600"><%= Date::MONTHNAMES[data[:month]] %> <%= data[:year] %></h2>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">Revenue</p>
+        <p class="font-bold text-gray-900"><%= number_to_currency(data[:total_revenue]) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">COGS</p>
+        <p class="font-bold text-gray-900"><%= number_to_currency(data[:cogs]) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">Expenses</p>
+        <p class="font-bold text-gray-900"><%= number_to_currency(data[:monthly_expenses] || 0) %></p>
+      </div>
+      <div class="bg-gray-50 p-3 rounded-lg">
+        <p class="text-sm text-gray-600">Net Profit</p>
+        <p class="font-bold <%= (data[:net_profit] || 0) >= 0 ? 'text-green-600' : 'text-red-600' %>"><%= number_to_currency(data[:net_profit] || 0) %></p>
+      </div>
+    </div>
 
     <div class="bg-gray-50 p-4 rounded-lg">
-      <h3 class="text-lg font-semibold mb-3 text-blue-600">Specific Revenue:</h3>
+      <h3 class="text-base sm:text-lg font-semibold mb-3 text-blue-600">Revenue by Type</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
         <% data[:sale_type_revenues].each do |sale_type_revenue| %>
-          <p class="mb-2 text-gray-700"><%= sale_type_revenue[:name] %>: <%= number_to_currency(sale_type_revenue[:revenue]) %></p>
+          <div class="flex justify-between">
+            <span class="text-gray-700"><%= sale_type_revenue[:name] %>:</span>
+            <span class="font-medium"><%= number_to_currency(sale_type_revenue[:revenue]) %></span>
+          </div>
         <% end %>
+      </div>
     </div>
   </div>
   <% end %>

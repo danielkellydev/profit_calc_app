@@ -24,12 +24,15 @@ Rails.application.routes.draw do
       get :sales_data
       get :weekly_history
       get :monthly_history
+      get :overview
     end
   end
 
   resources :sale_types
   resources :settings
   resources :custom_periods
+  resources :expense_categories
+  resources :expenses
 
   get 'home/index'
 end
