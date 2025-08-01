@@ -22,7 +22,11 @@ class SalesController < ApplicationController
     begin
       if @sale.save
         create_sale_items
-        redirect_to dashboard_index_path, notice: 'Sale was successfully created.'
+        flash.now[:notice] = 'Sale was successfully created.'
+        @sale = Sale.new
+        @products = current_user.products 
+        @sale_types = current_user.sale_types
+        render :new
       else
         render :new, status: :unprocessable_entity
       end
