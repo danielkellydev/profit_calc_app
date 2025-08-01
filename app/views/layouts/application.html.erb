@@ -80,10 +80,24 @@
     <main class="mt-4 sm:mt-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <% if notice %>
-          <p class="alert alert-success"><%= notice %></p>
+          <div class="flash-message bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md mb-4 relative" data-controller="flash" data-flash-auto-dismiss-value="5000">
+            <%= notice %>
+            <button data-action="click->flash#dismiss" class="absolute top-0 right-0 mt-2 mr-2 text-green-600 hover:text-green-800">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          </div>
         <% end %>
         <% if alert %>
-          <p class="alert alert-danger"><%= alert %></p>
+          <div class="flash-message bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-4 relative" data-controller="flash" data-flash-auto-dismiss-value="7000">
+            <%= alert %>
+            <button data-action="click->flash#dismiss" class="absolute top-0 right-0 mt-2 mr-2 text-red-600 hover:text-red-800">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          </div>
         <% end %>
         <%= yield %>
       </div>
