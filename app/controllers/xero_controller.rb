@@ -1,3 +1,6 @@
+require 'net/http'
+require 'json'
+
 class XeroController < ApplicationController
   before_action :authenticate_user!
 
@@ -17,8 +20,8 @@ class XeroController < ApplicationController
         )
         
         # Fetch and store tenant ID
-        xero_client = XeroService.new(current_user)
-        connections = xero_client.get_connections
+        xero_service = XeroService.new(current_user)
+        connections = xero_service.get_connections
         if connections.any?
           current_user.update!(xero_tenant_id: connections.first['tenantId'])
         end
@@ -26,7 +29,7 @@ class XeroController < ApplicationController
         redirect_to settings_path, notice: "Successfully connected to Xero!"
       rescue => e
         Rails.logger.error "Xero OAuth error: #{e.message}"
-        redirect_to settings_path, alert: "Failed to connect to Xero: #{e.message}"
+        redirect_to settings_path, alert: "Failed to connect to Xero"
       end
     else
       redirect_to settings_path, alert: "Authorization cancelled or failed"

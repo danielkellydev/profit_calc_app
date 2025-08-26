@@ -1,3 +1,6 @@
+require 'net/http'
+require 'json'
+
 class XeroService
   def initialize(user)
     @user = user
@@ -7,8 +10,20 @@ class XeroService
   def get_connections
     refresh_token_if_expired!
     
-    response = @xero_client.get_connections
-    response
+    # Use direct HTTP call to get connections
+    uri = URI('https://api.xero.com/connections')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    
+    request = Net::HTTP::Get.new(uri)
+    request['Authorization'] = "Bearer #{@user.xero_access_token}"
+    request['Content-Type'] = 'application/json'
+    
+    response = http.request(request)
+    JSON.parse(response.body)
+  rescue => e
+    Rails.logger.error "Failed to get Xero connections: #{e.message}"
+    []
   end
 
   def get_accounts
