@@ -84,10 +84,10 @@ class XeroService
     
     refresh_token_if_expired!
     
-    # Create a simple sales receipt (combined invoice + payment)
+    # Create a simple sales receipt
     contact = find_or_create_cash_sale_contact
     
-    # Create invoice with payment in one go
+    # Step 1: Create the invoice
     invoice_data = {
       "Type" => "ACCREC",
       "Contact" => { "ContactID" => contact['ContactID'] },
@@ -95,14 +95,7 @@ class XeroService
       "DueDate" => sale.sale_date&.to_s || Date.current.to_s,
       "Status" => "AUTHORISED",
       "LineAmountTypes" => "Exclusive",
-      "LineItems" => build_line_items_for_sale(sale),
-      "Payments" => [
-        {
-          "Account" => { "Code" => sale.sale_type.xero_account_code },
-          "Date" => sale.sale_date&.to_s || Date.current.to_s,
-          "Amount" => sale.total_received.to_f
-        }
-      ]
+      "LineItems" => build_line_items_for_sale(sale)
     }
     
     uri = URI('https://api.xero.com/api.xro/2.0/Invoices')
@@ -123,9 +116,38 @@ class XeroService
       raise "Failed to create invoice in Xero: #{response.code}"
     end
     
-    result = JSON.parse(response.body)
-    Rails.logger.info "Successfully synced sale #{sale.id} to Xero"
-    result['Invoices']&.first
+    invoice_result = JSON.parse(response.body)
+    invoice = invoice_result['Invoices']&.first
+    
+    return unless invoice && invoice['InvoiceID']
+    
+    # Step 2: Create the payment
+    payment_data = {
+      "Invoice" => { "InvoiceID" => invoice['InvoiceID'] },
+      "Account" => { "Code" => sale.sale_type.xero_account_code },
+      "Date" => sale.sale_date&.to_s || Date.current.to_s,
+      "Amount" => sale.total_received.to_f
+    }
+    
+    uri = URI('https://api.xero.com/api.xro/2.0/Payments')
+    request = Net::HTTP::Post.new(uri)
+    request['Authorization'] = "Bearer #{@user.xero_access_token}"
+    request['Content-Type'] = 'application/json'
+    request['Accept'] = 'application/json'
+    request['Xero-Tenant-Id'] = @user.xero_tenant_id
+    request.body = { "Payments" => [payment_data] }.to_json
+    
+    response = http.request(request)
+    
+    if response.code.to_i != 200
+      Rails.logger.error "Failed to create Xero payment: Status: #{response.code}, Body: #{response.body}"
+      # Don't raise here - invoice was created successfully, just log the payment failure
+      Rails.logger.warn "Invoice created but payment failed for sale #{sale.id}"
+    else
+      Rails.logger.info "Successfully synced sale #{sale.id} to Xero with payment"
+    end
+    
+    invoice
   rescue => e
     Rails.logger.error "Failed to sync sale to Xero: #{e.message}"
     raise
