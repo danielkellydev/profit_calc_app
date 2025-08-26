@@ -66,7 +66,7 @@ class XeroController < ApplicationController
   def xero_authorization_url
     client_id = Rails.application.credentials.xero[:client_id]
     redirect_uri = Rails.application.credentials.xero[:redirect_uri]
-    scope = "accounting.transactions accounting.settings offline_access"
+    scope = "accounting.transactions accounting.settings accounting.contacts accounting.journals.read offline_access"
     
     "https://login.xero.com/identity/connect/authorize?" + {
       response_type: 'code',
