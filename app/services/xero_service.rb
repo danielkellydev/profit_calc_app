@@ -84,26 +84,74 @@ class XeroService
     
     refresh_token_if_expired!
     
-    accounting_api = XeroRuby::AccountingApi.new(@xero_client)
+    # Create a simple sales receipt (combined invoice + payment)
+    contact = find_or_create_cash_sale_contact
     
-    # Create a sales invoice first
-    contact = find_or_create_contact(accounting_api)
-    invoice = create_invoice(accounting_api, sale, contact)
+    # Create invoice with payment in one go
+    invoice_data = {
+      "Type" => "ACCREC",
+      "Contact" => { "ContactID" => contact['ContactID'] },
+      "Date" => sale.sale_date&.to_s || Date.current.to_s,
+      "DueDate" => sale.sale_date&.to_s || Date.current.to_s,
+      "Status" => "AUTHORISED",
+      "LineAmountTypes" => "Exclusive",
+      "LineItems" => build_line_items_for_sale(sale),
+      "Payments" => [
+        {
+          "Account" => { "Code" => sale.sale_type.xero_account_code },
+          "Date" => sale.sale_date&.to_s || Date.current.to_s,
+          "Amount" => sale.total_received.to_f
+        }
+      ]
+    }
     
-    # Then create a payment for that invoice
-    payment = XeroRuby::Payment.new(
-      invoice: { invoice_id: invoice.invoice_id },
-      account: { code: sale.sale_type.xero_account_code },
-      date: sale.sale_date || Date.current,
-      amount: sale.total_revenue.to_f
-    )
+    uri = URI('https://api.xero.com/api.xro/2.0/Invoices')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
     
-    payments = XeroRuby::Payments.new(payments: [payment])
-    result = accounting_api.create_payment(@user.xero_tenant_id, payments)
-    result.payments.first
+    request = Net::HTTP::Post.new(uri)
+    request['Authorization'] = "Bearer #{@user.xero_access_token}"
+    request['Content-Type'] = 'application/json'
+    request['Accept'] = 'application/json'
+    request['Xero-Tenant-Id'] = @user.xero_tenant_id
+    request.body = { "Invoices" => [invoice_data] }.to_json
+    
+    response = http.request(request)
+    
+    if response.code.to_i != 200
+      Rails.logger.error "Failed to create Xero invoice: Status: #{response.code}, Body: #{response.body}"
+      raise "Failed to create invoice in Xero: #{response.code}"
+    end
+    
+    result = JSON.parse(response.body)
+    Rails.logger.info "Successfully synced sale #{sale.id} to Xero"
+    result['Invoices']&.first
   rescue => e
     Rails.logger.error "Failed to sync sale to Xero: #{e.message}"
     raise
+  end
+  
+  private
+  
+  def build_line_items_for_sale(sale)
+    if sale.sale_items.any?
+      sale.sale_items.map do |item|
+        {
+          "Description" => item.product.name,
+          "Quantity" => item.quantity.to_f,
+          "UnitAmount" => item.price.to_f,
+          "AccountCode" => "200" # Default sales account
+        }
+      end
+    else
+      # Single line item for sales without items
+      [{
+        "Description" => sale.sale_type&.name || "Cash Sale",
+        "Quantity" => 1.0,
+        "UnitAmount" => sale.total_received.to_f,
+        "AccountCode" => "200"
+      }]
+    end
   end
 
   private
@@ -165,57 +213,53 @@ class XeroService
     end
   end
 
-  def find_or_create_contact(api)
-    # Use a default "Cash Sale" contact
-    contacts = api.get_contacts(@user.xero_tenant_id, where: "Name=\"Cash Sale\"")
+  def find_or_create_cash_sale_contact
+    # First try to find existing "Cash Sale" contact
+    uri = URI('https://api.xero.com/api.xro/2.0/Contacts')
+    uri.query = URI.encode_www_form(where: 'Name=="Cash Sale"')
     
-    if contacts.contacts.any?
-      contacts.contacts.first
-    else
-      contact = XeroRuby::Contact.new(
-        name: "Cash Sale",
-        contact_status: 'ACTIVE'
-      )
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    
+    request = Net::HTTP::Get.new(uri)
+    request['Authorization'] = "Bearer #{@user.xero_access_token}"
+    request['Content-Type'] = 'application/json'
+    request['Accept'] = 'application/json'
+    request['Xero-Tenant-Id'] = @user.xero_tenant_id
+    
+    response = http.request(request)
+    
+    if response.code.to_i == 200
+      data = JSON.parse(response.body)
+      contacts = data['Contacts'] || []
       
-      contacts_obj = XeroRuby::Contacts.new(contacts: [contact])
-      result = api.create_contacts(@user.xero_tenant_id, contacts_obj)
-      result.contacts.first
-    end
-  end
-
-  def create_invoice(api, sale, contact)
-    line_items = sale.sale_items.map do |item|
-      XeroRuby::LineItem.new(
-        description: item.product.name,
-        quantity: item.quantity.to_f,
-        unit_amount: item.price.to_f,
-        account_code: '200' # Default sales account - you may want to make this configurable
-      )
+      if contacts.any?
+        return contacts.first
+      end
     end
     
-    # If no sale items, create a single line item
-    if line_items.empty?
-      line_items = [
-        XeroRuby::LineItem.new(
-          description: sale.sale_type&.name || "Cash Sale",
-          quantity: 1.0,
-          unit_amount: sale.total_revenue.to_f,
-          account_code: '200'
-        )
-      ]
+    # Create new "Cash Sale" contact if not found
+    contact_data = {
+      "Name" => "Cash Sale",
+      "ContactStatus" => "ACTIVE"
+    }
+    
+    uri = URI('https://api.xero.com/api.xro/2.0/Contacts')
+    request = Net::HTTP::Post.new(uri)
+    request['Authorization'] = "Bearer #{@user.xero_access_token}"
+    request['Content-Type'] = 'application/json'
+    request['Accept'] = 'application/json'
+    request['Xero-Tenant-Id'] = @user.xero_tenant_id
+    request.body = { "Contacts" => [contact_data] }.to_json
+    
+    response = http.request(request)
+    
+    if response.code.to_i != 200
+      Rails.logger.error "Failed to create contact: Status: #{response.code}, Body: #{response.body}"
+      raise "Failed to create contact in Xero"
     end
     
-    invoice = XeroRuby::Invoice.new(
-      type: 'ACCREC',
-      contact: contact,
-      date: sale.sale_date || Date.current,
-      due_date: sale.sale_date || Date.current,
-      line_items: line_items,
-      status: 'AUTHORISED'
-    )
-    
-    invoices = XeroRuby::Invoices.new(invoices: [invoice])
-    result = api.create_invoices(@user.xero_tenant_id, invoices)
-    result.invoices.first
+    result = JSON.parse(response.body)
+    result['Contacts']&.first
   end
 end
