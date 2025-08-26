@@ -47,6 +47,6 @@ class SaleTypesController < ApplicationController
   end
 
   def sale_type_params
-    params.require(:sale_type).permit(:name, :sync_to_xero, :xero_account_code, :xero_account_name)
+    params.require(:sale_type).permit(:name, :sync_to_xero, :xero_account_code, :xero_account_name, :xero_revenue_account_code)
   end
 end

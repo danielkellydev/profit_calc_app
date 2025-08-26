@@ -36,16 +36,26 @@
         <%= form.label :sync_to_xero, 'Sync sales of this type to Xero', class: 'ml-2 text-sm text-gray-700' %>
       </div>
 
-      <div id="xero-account-fields" class="<%= sale_type.sync_to_xero? ? '' : 'hidden' %>">
-        <label class="block text-sm font-medium text-gray-700">Select Bank Account for Payment</label>
-        <p class="text-xs text-gray-500 mb-2">Payments must be recorded to a bank account in Xero</p>
-        <select id="xero-account-select" 
-                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                data-action="change->xero-sync#selectAccount">
-          <option value="">Loading bank accounts...</option>
-        </select>
-        <%= form.hidden_field :xero_account_code %>
-        <%= form.hidden_field :xero_account_name %>
+      <div id="xero-account-fields" class="<%= sale_type.sync_to_xero? ? '' : 'hidden' %> space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Select Bank Account for Payment</label>
+          <p class="text-xs text-gray-500 mb-2">Where the money goes (e.g., Cash on Hand, Business Checking)</p>
+          <select id="xero-account-select" 
+                  class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  data-action="change->xero-sync#selectAccount">
+            <option value="">Loading bank accounts...</option>
+          </select>
+          <%= form.hidden_field :xero_account_code %>
+          <%= form.hidden_field :xero_account_name %>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Revenue Account Code (Optional)</label>
+          <p class="text-xs text-gray-500 mb-2">Leave blank to use default (200). Or use custom codes like 201 for cash sales, 202 for online sales</p>
+          <%= form.text_field :xero_revenue_account_code, 
+              placeholder: "e.g., 200, 201, 202", 
+              class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm' %>
+        </div>
       </div>
     </div>
   <% else %>

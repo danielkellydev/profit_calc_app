@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_08_26_130022) do
+ActiveRecord::Schema[7.0].define(version: 2025_08_26_145400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -79,6 +79,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_130022) do
     t.boolean "sync_to_xero"
     t.string "xero_account_code"
     t.string "xero_account_name"
+    t.string "xero_revenue_account_code"
     t.index ["user_id"], name: "index_sale_types_on_user_id"
   end
 

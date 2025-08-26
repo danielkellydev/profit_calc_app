@@ -132,12 +132,15 @@ class XeroService
   private
   
   def build_line_items_for_sale(sale)
+    # Use custom revenue account code if specified, otherwise default to 200
+    revenue_code = sale.sale_type&.xero_revenue_account_code.presence || "200"
+    
     # Always use a single generic line item
     [{
       "Description" => "Consult/Herbal Product Fees",
       "Quantity" => 1.0,
       "UnitAmount" => sale.total_received.to_f,
-      "AccountCode" => "200" # Default sales account
+      "AccountCode" => revenue_code
     }]
   end
 
