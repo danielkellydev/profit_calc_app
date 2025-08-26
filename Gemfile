@@ -36,6 +36,10 @@ gem "redis", "~> 4.0"
 # Use Devise to implement multi-user functionality
 gem "devise"
 
+# Xero API integration
+gem "xero-ruby"
+gem "oauth2"
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 

@@ -8,4 +8,17 @@ class Sale < ApplicationRecord
   validates :sale_type, presence: true
   validates :total_received, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :sale_date, presence: true
+
+  after_create :sync_to_xero
+  
+  private
+  
+  def sync_to_xero
+    return unless sale_type&.sync_to_xero?
+    return unless user.xero_access_token.present?
+    
+    SyncSaleToXeroJob.perform_later(self)
+  rescue => e
+    Rails.logger.error "Failed to queue Xero sync for sale #{id}: #{e.message}"
+  end
 end

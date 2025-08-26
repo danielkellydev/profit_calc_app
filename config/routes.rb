@@ -34,5 +34,11 @@ Rails.application.routes.draw do
   resources :expense_categories
   resources :expenses
 
+  # Xero OAuth routes
+  get 'auth/xero/connect', to: 'xero#connect', as: :xero_connect
+  get 'auth/xero/callback', to: 'xero#callback', as: :xero_callback
+  delete 'auth/xero/disconnect', to: 'xero#disconnect', as: :xero_disconnect
+  get 'xero/accounts', to: 'xero#fetch_accounts', as: :xero_accounts
+
   get 'home/index'
 end

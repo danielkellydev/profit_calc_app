@@ -1,4 +1,4 @@
-<%= form_with(model: sale_type, local: true, class: 'space-y-6') do |form| %>
+<%= form_with(model: sale_type, local: true, class: 'space-y-6', data: { controller: 'xero-sync' }) do |form| %>
   <% if sale_type.errors.any? %>
     <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
       <div class="flex">
@@ -25,6 +25,35 @@
     <%= form.label :name, class: 'block text-sm font-medium text-gray-700' %>
     <%= form.text_field :name, class: 'mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' %>
   </div>
+
+  <% if current_user.xero_access_token.present? %>
+    <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+      <h3 class="text-sm font-medium text-gray-900">Xero Integration</h3>
+      
+      <div>
+        <%= form.check_box :sync_to_xero, class: 'h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded', 
+            data: { action: 'change->xero-sync#toggleSync' } %>
+        <%= form.label :sync_to_xero, 'Sync sales of this type to Xero', class: 'ml-2 text-sm text-gray-700' %>
+      </div>
+
+      <div id="xero-account-fields" class="<%= sale_type.sync_to_xero? ? '' : 'hidden' %>">
+        <label class="block text-sm font-medium text-gray-700">Select Xero Account</label>
+        <select id="xero-account-select" 
+                class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                data-action="change->xero-sync#selectAccount">
+          <option value="">Loading accounts...</option>
+        </select>
+        <%= form.hidden_field :xero_account_code %>
+        <%= form.hidden_field :xero_account_name %>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-yellow-50 p-4 rounded-lg">
+      <p class="text-sm text-yellow-800">
+        Connect to Xero in <%= link_to "Settings", settings_path, class: "underline font-medium" %> to enable automatic syncing of sales.
+      </p>
+    </div>
+  <% end %>
 
   <div>
     <%= form.submit class: 'inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500' %>
