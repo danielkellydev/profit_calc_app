@@ -4,6 +4,7 @@ require 'json'
 class XeroService
   def initialize(user)
     @user = user
+    refresh_token_if_expired!
     @xero_client = XeroRuby::ApiClient.new(credentials: xero_credentials)
   end
 
@@ -29,6 +30,9 @@ class XeroService
   def get_accounts
     refresh_token_if_expired!
     
+    # Set the access token in the API client configuration
+    @xero_client.config.access_token = @user.xero_access_token
+    
     accounting_api = XeroRuby::AccountingApi.new(@xero_client)
     accounts = accounting_api.get_accounts(@user.xero_tenant_id).accounts
     
@@ -41,6 +45,9 @@ class XeroService
         description: account.description
       }
     end.select { |acc| acc[:status] == 'ACTIVE' }
+  rescue => e
+    Rails.logger.error "Failed to fetch Xero accounts: #{e.message}"
+    raise
   end
 
   def create_payment(sale)
@@ -76,15 +83,19 @@ class XeroService
     {
       client_id: Rails.application.credentials.xero[:client_id],
       client_secret: Rails.application.credentials.xero[:client_secret],
+      grant_type: 'authorization_code',
+      access_token: @user.xero_access_token,
       token_set: {
         access_token: @user.xero_access_token,
-        refresh_token: @user.xero_refresh_token
+        refresh_token: @user.xero_refresh_token,
+        expires_at: @user.xero_token_expires_at&.to_i
       }
     }
   end
 
   def refresh_token_if_expired!
-    return unless @user.xero_token_expires_at && @user.xero_token_expires_at < Time.current + 5.minutes
+    return if @user.xero_token_expires_at.nil?
+    return if @user.xero_token_expires_at > Time.current + 5.minutes
     
     client_id = Rails.application.credentials.xero[:client_id]
     client_secret = Rails.application.credentials.xero[:client_secret]
@@ -99,13 +110,21 @@ class XeroService
     
     token_data = JSON.parse(response.body)
     
+    if token_data['error']
+      Rails.logger.error "Failed to refresh Xero token: #{token_data['error_description']}"
+      raise "Failed to refresh Xero token: #{token_data['error_description']}"
+    end
+    
     @user.update!(
       xero_access_token: token_data['access_token'],
       xero_refresh_token: token_data['refresh_token'],
       xero_token_expires_at: Time.current + token_data['expires_in'].to_i.seconds
     )
     
-    @xero_client = XeroRuby::ApiClient.new(credentials: xero_credentials)
+    # Recreate the client with new credentials if it exists
+    if @xero_client
+      @xero_client = XeroRuby::ApiClient.new(credentials: xero_credentials)
+    end
   end
 
   def find_or_create_contact(api)
