@@ -23,7 +23,8 @@ class XeroController < ApplicationController
         xero_service = XeroService.new(current_user)
         connections = xero_service.get_connections
         if connections.any?
-          current_user.update!(xero_tenant_id: connections.first['tenantId'])
+          tenant_id = connections.first['tenantId'] || connections.first['id']
+          current_user.update!(xero_tenant_id: tenant_id) if tenant_id
         end
         
         redirect_to settings_path, notice: "Successfully connected to Xero!"
@@ -48,6 +49,7 @@ class XeroController < ApplicationController
 
   def fetch_accounts
     return render json: { error: "Not connected to Xero" }, status: :unauthorized unless current_user.xero_access_token.present?
+    return render json: { error: "Xero tenant not found" }, status: :unauthorized unless current_user.xero_tenant_id.present?
     
     begin
       xero_service = XeroService.new(current_user)
@@ -55,7 +57,7 @@ class XeroController < ApplicationController
       render json: accounts
     rescue => e
       Rails.logger.error "Failed to fetch Xero accounts: #{e.message}"
-      render json: { error: "Failed to fetch accounts" }, status: :internal_server_error
+      render json: { error: "Failed to fetch accounts: #{e.message}" }, status: :internal_server_error
     end
   end
 

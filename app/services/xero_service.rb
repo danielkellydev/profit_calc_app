@@ -33,10 +33,14 @@ class XeroService
     # Set the access token in the API client configuration
     @xero_client.config.access_token = @user.xero_access_token
     
-    accounting_api = XeroRuby::AccountingApi.new(@xero_client)
-    accounts = accounting_api.get_accounts(@user.xero_tenant_id).accounts
+    Rails.logger.info "Fetching accounts for tenant: #{@user.xero_tenant_id}"
     
-    accounts.map do |account|
+    accounting_api = XeroRuby::AccountingApi.new(@xero_client)
+    response = accounting_api.get_accounts(@user.xero_tenant_id)
+    
+    return [] unless response&.accounts
+    
+    response.accounts.map do |account|
       {
         code: account.code,
         name: account.name,
@@ -45,8 +49,12 @@ class XeroService
         description: account.description
       }
     end.select { |acc| acc[:status] == 'ACTIVE' }
+  rescue XeroRuby::ApiError => e
+    Rails.logger.error "Xero API error fetching accounts: Status: #{e.code}, Message: #{e.message}"
+    Rails.logger.error "Response body: #{e.response_body}"
+    raise
   rescue => e
-    Rails.logger.error "Failed to fetch Xero accounts: #{e.message}"
+    Rails.logger.error "Failed to fetch Xero accounts: #{e.class.name}: #{e.message}"
     raise
   end
 
