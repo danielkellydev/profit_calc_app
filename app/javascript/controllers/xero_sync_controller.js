@@ -45,9 +45,12 @@ export default class extends Controller {
           
           groupedAccounts[type].forEach(account => {
             const option = document.createElement('option')
-            option.value = account.code
-            option.textContent = `${account.code} - ${account.name}`
+            // Use account_id if code is null or missing
+            const accountIdentifier = account.code || account.account_id
+            option.value = accountIdentifier
+            option.textContent = account.code ? `${account.code} - ${account.name}` : account.name
             option.dataset.accountName = account.name
+            option.dataset.accountId = account.account_id
             optgroup.appendChild(option)
           })
           

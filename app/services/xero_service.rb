@@ -122,9 +122,13 @@ class XeroService
     return unless invoice && invoice['InvoiceID']
     
     # Step 2: Create the payment
+    # Use AccountID if the code looks like a GUID, otherwise use Code
+    account_ref = sale.sale_type.xero_account_code
+    account_field = account_ref&.match?(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? "AccountID" : "Code"
+    
     payment_data = {
       "Invoice" => { "InvoiceID" => invoice['InvoiceID'] },
-      "Account" => { "Code" => sale.sale_type.xero_account_code },
+      "Account" => { account_field => account_ref },
       "Date" => sale.sale_date&.to_s || Date.current.to_s,
       "Amount" => sale.total_received.to_f
     }
