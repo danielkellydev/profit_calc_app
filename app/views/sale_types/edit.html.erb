@@ -2,7 +2,7 @@
   <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
     <h1 class="text-3xl font-semibold mb-8 text-gray-800">Edit Sale Type</h1>
     
-    <%= render "edit_form", sale_type: @sale_type %>
+    <%= render "form", sale_type: @sale_type %>
     
     <%= link_to 'Back to Sale Types', sale_types_path, class: 'mt-4 inline-block text-blue-600 hover:text-blue-800', data: { turbo_frame: "content_frame" } %>
   </div>
