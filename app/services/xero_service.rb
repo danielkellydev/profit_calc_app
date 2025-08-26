@@ -134,24 +134,13 @@ class XeroService
   private
   
   def build_line_items_for_sale(sale)
-    if sale.sale_items.any?
-      sale.sale_items.map do |item|
-        {
-          "Description" => item.product.name,
-          "Quantity" => item.quantity.to_f,
-          "UnitAmount" => item.price.to_f,
-          "AccountCode" => "200" # Default sales account
-        }
-      end
-    else
-      # Single line item for sales without items
-      [{
-        "Description" => sale.sale_type&.name || "Cash Sale",
-        "Quantity" => 1.0,
-        "UnitAmount" => sale.total_received.to_f,
-        "AccountCode" => "200"
-      }]
-    end
+    # Always use a single generic line item
+    [{
+      "Description" => "Consult/Herbal Product Fees",
+      "Quantity" => 1.0,
+      "UnitAmount" => sale.total_received.to_f,
+      "AccountCode" => "200" # Default sales account
+    }]
   end
 
   private
