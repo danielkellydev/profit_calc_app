@@ -30,29 +30,50 @@ class XeroService
   def get_accounts
     refresh_token_if_expired!
     
-    # Set the access token in the API client configuration
-    @xero_client.config.access_token = @user.xero_access_token
-    
     Rails.logger.info "Fetching accounts for tenant: #{@user.xero_tenant_id}"
     
-    accounting_api = XeroRuby::AccountingApi.new(@xero_client)
-    response = accounting_api.get_accounts(@user.xero_tenant_id)
+    # Use direct HTTP call with proper headers
+    uri = URI('https://api.xero.com/api.xro/2.0/Accounts')
+    uri.query = URI.encode_www_form(where: 'Status=="ACTIVE"')
     
-    return [] unless response&.accounts
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
     
-    response.accounts.map do |account|
+    request = Net::HTTP::Get.new(uri)
+    request['Authorization'] = "Bearer #{@user.xero_access_token}"
+    request['Content-Type'] = 'application/json'
+    request['Accept'] = 'application/json'
+    request['Xero-Tenant-Id'] = @user.xero_tenant_id
+    
+    response = http.request(request)
+    
+    if response.code.to_i == 401
+      Rails.logger.error "Xero API returned 401 - attempting token refresh"
+      refresh_token_if_expired!(force: true)
+      # Retry with new token
+      request['Authorization'] = "Bearer #{@user.xero_access_token}"
+      response = http.request(request)
+    end
+    
+    if response.code.to_i != 200
+      Rails.logger.error "Xero API error: Status: #{response.code}, Body: #{response.body}"
+      raise "Failed to fetch accounts from Xero: #{response.code}"
+    end
+    
+    data = JSON.parse(response.body)
+    accounts = data['Accounts'] || []
+    
+    # Group and format accounts similar to your other app
+    accounts.map do |account|
       {
-        code: account.code,
-        name: account.name,
-        type: account.type,
-        status: account.status,
-        description: account.description
+        code: account['Code'],
+        name: account['Name'],
+        type: account['Type'],
+        status: account['Status'],
+        description: account['Description'],
+        account_id: account['AccountID']
       }
     end.select { |acc| acc[:status] == 'ACTIVE' }
-  rescue XeroRuby::ApiError => e
-    Rails.logger.error "Xero API error fetching accounts: Status: #{e.code}, Message: #{e.message}"
-    Rails.logger.error "Response body: #{e.response_body}"
-    raise
   rescue => e
     Rails.logger.error "Failed to fetch Xero accounts: #{e.class.name}: #{e.message}"
     raise
@@ -101,21 +122,28 @@ class XeroService
     }
   end
 
-  def refresh_token_if_expired!
-    return if @user.xero_token_expires_at.nil?
-    return if @user.xero_token_expires_at > Time.current + 5.minutes
+  def refresh_token_if_expired!(force: false)
+    return if @user.xero_token_expires_at.nil? && !force
+    return if !force && @user.xero_token_expires_at > Time.current + 5.minutes
+    
+    Rails.logger.info "Refreshing Xero token (force: #{force})"
     
     client_id = Rails.application.credentials.xero[:client_id]
     client_secret = Rails.application.credentials.xero[:client_secret]
     
-    response = Net::HTTP.post_form(
-      URI('https://identity.xero.com/connect/token'),
-      grant_type: 'refresh_token',
-      refresh_token: @user.xero_refresh_token,
-      client_id: client_id,
-      client_secret: client_secret
+    # Use Basic Auth as per your other app's implementation
+    uri = URI('https://identity.xero.com/connect/token')
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    
+    request = Net::HTTP::Post.new(uri)
+    request.basic_auth(client_id, client_secret)
+    request.set_form_data(
+      'grant_type' => 'refresh_token',
+      'refresh_token' => @user.xero_refresh_token
     )
     
+    response = http.request(request)
     token_data = JSON.parse(response.body)
     
     if token_data['error']
@@ -128,6 +156,8 @@ class XeroService
       xero_refresh_token: token_data['refresh_token'],
       xero_token_expires_at: Time.current + token_data['expires_in'].to_i.seconds
     )
+    
+    Rails.logger.info "Successfully refreshed Xero token"
     
     # Recreate the client with new credentials if it exists
     if @xero_client
