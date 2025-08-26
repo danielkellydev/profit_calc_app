@@ -84,21 +84,26 @@ class XeroService
     
     refresh_token_if_expired!
     
-    # Create a simple sales receipt
-    contact = find_or_create_cash_sale_contact
+    # Create a direct bank transaction (Receive Money) instead of invoice + payment
+    # This avoids Xero's invoice limits and is simpler for cash sales
     
-    # Step 1: Create the invoice
-    invoice_data = {
-      "Type" => "ACCREC",
-      "Contact" => { "ContactID" => contact['ContactID'] },
+    # Use AccountID if the code looks like a GUID, otherwise use Code
+    account_ref = sale.sale_type.xero_account_code
+    account_field = account_ref&.match?(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? "AccountID" : "Code"
+    
+    bank_transaction_data = {
+      "Type" => "RECEIVE",  # Money coming in
+      "Contact" => find_or_create_cash_sale_contact,
       "Date" => sale.sale_date&.to_s || Date.current.to_s,
-      "DueDate" => sale.sale_date&.to_s || Date.current.to_s,
-      "Status" => "AUTHORISED",
       "LineAmountTypes" => "Exclusive",
-      "LineItems" => build_line_items_for_sale(sale)
+      "LineItems" => build_line_items_for_sale(sale),
+      "BankAccount" => { account_field => account_ref },
+      "IsReconciled" => false,
+      "Reference" => "Sale ##{sale.id}",
+      "Status" => "AUTHORISED"
     }
     
-    uri = URI('https://api.xero.com/api.xro/2.0/Invoices')
+    uri = URI('https://api.xero.com/api.xro/2.0/BankTransactions')
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     
@@ -107,51 +112,18 @@ class XeroService
     request['Content-Type'] = 'application/json'
     request['Accept'] = 'application/json'
     request['Xero-Tenant-Id'] = @user.xero_tenant_id
-    request.body = { "Invoices" => [invoice_data] }.to_json
+    request.body = { "BankTransactions" => [bank_transaction_data] }.to_json
     
     response = http.request(request)
     
-    if response.code.to_i != 200
-      Rails.logger.error "Failed to create Xero invoice: Status: #{response.code}, Body: #{response.body}"
-      raise "Failed to create invoice in Xero: #{response.code}"
-    end
-    
-    invoice_result = JSON.parse(response.body)
-    invoice = invoice_result['Invoices']&.first
-    
-    return unless invoice && invoice['InvoiceID']
-    
-    # Step 2: Create the payment
-    # Use AccountID if the code looks like a GUID, otherwise use Code
-    account_ref = sale.sale_type.xero_account_code
-    account_field = account_ref&.match?(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i) ? "AccountID" : "Code"
-    
-    payment_data = {
-      "Invoice" => { "InvoiceID" => invoice['InvoiceID'] },
-      "Account" => { account_field => account_ref },
-      "Date" => sale.sale_date&.to_s || Date.current.to_s,
-      "Amount" => sale.total_received.to_f
-    }
-    
-    uri = URI('https://api.xero.com/api.xro/2.0/Payments')
-    request = Net::HTTP::Post.new(uri)
-    request['Authorization'] = "Bearer #{@user.xero_access_token}"
-    request['Content-Type'] = 'application/json'
-    request['Accept'] = 'application/json'
-    request['Xero-Tenant-Id'] = @user.xero_tenant_id
-    request.body = { "Payments" => [payment_data] }.to_json
-    
-    response = http.request(request)
-    
-    if response.code.to_i != 200
-      Rails.logger.error "Failed to create Xero payment: Status: #{response.code}, Body: #{response.body}"
-      # Don't raise here - invoice was created successfully, just log the payment failure
-      Rails.logger.warn "Invoice created but payment failed for sale #{sale.id}"
+    if response.code.to_i == 200 || response.code.to_i == 201
+      result = JSON.parse(response.body)
+      Rails.logger.info "Successfully synced sale #{sale.id} to Xero as bank transaction"
+      result['BankTransactions']&.first
     else
-      Rails.logger.info "Successfully synced sale #{sale.id} to Xero with payment"
+      Rails.logger.error "Failed to create Xero bank transaction: Status: #{response.code}, Body: #{response.body}"
+      raise "Failed to create bank transaction in Xero: #{response.code}"
     end
-    
-    invoice
   rescue => e
     Rails.logger.error "Failed to sync sale to Xero: #{e.message}"
     raise
