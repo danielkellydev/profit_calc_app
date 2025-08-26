@@ -37,11 +37,12 @@
       </div>
 
       <div id="xero-account-fields" class="<%= sale_type.sync_to_xero? ? '' : 'hidden' %>">
-        <label class="block text-sm font-medium text-gray-700">Select Xero Account</label>
+        <label class="block text-sm font-medium text-gray-700">Select Bank Account for Payment</label>
+        <p class="text-xs text-gray-500 mb-2">Payments must be recorded to a bank account in Xero</p>
         <select id="xero-account-select" 
                 class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 data-action="change->xero-sync#selectAccount">
-          <option value="">Loading accounts...</option>
+          <option value="">Loading bank accounts...</option>
         </select>
         <%= form.hidden_field :xero_account_code %>
         <%= form.hidden_field :xero_account_name %>

@@ -32,9 +32,9 @@ class XeroService
     
     Rails.logger.info "Fetching accounts for tenant: #{@user.xero_tenant_id}"
     
-    # Use direct HTTP call with proper headers
+    # Use direct HTTP call with proper headers - ONLY get BANK accounts for payment sync
     uri = URI('https://api.xero.com/api.xro/2.0/Accounts')
-    uri.query = URI.encode_www_form(where: 'Status=="ACTIVE"')
+    uri.query = URI.encode_www_form(where: 'Status=="ACTIVE"&&Type=="BANK"')
     
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -63,7 +63,7 @@ class XeroService
     data = JSON.parse(response.body)
     accounts = data['Accounts'] || []
     
-    # Group and format accounts similar to your other app
+    # Return only BANK accounts for payment recording
     accounts.map do |account|
       {
         code: account['Code'],
@@ -73,7 +73,7 @@ class XeroService
         description: account['Description'],
         account_id: account['AccountID']
       }
-    end.select { |acc| acc[:status] == 'ACTIVE' }
+    end.select { |acc| acc[:status] == 'ACTIVE' && acc[:type] == 'BANK' }
   rescue => e
     Rails.logger.error "Failed to fetch Xero accounts: #{e.class.name}: #{e.message}"
     raise
