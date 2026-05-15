@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_08_26_145400) do
+ActiveRecord::Schema[7.0].define(version: 2026_05_15_120005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "custom_periods", force: :cascade do |t|
     t.string "name"
@@ -30,6 +58,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_145400) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "business_use_percentage", precision: 5, scale: 2, default: "100.0", null: false
     t.index ["user_id"], name: "index_expense_categories_on_user_id"
   end
 
@@ -44,61 +73,25 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_145400) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "business_use_percentage", precision: 5, scale: 2
     t.index ["active"], name: "index_expenses_on_active"
     t.index ["expense_category_id"], name: "index_expenses_on_expense_category_id"
     t.index ["frequency"], name: "index_expenses_on_frequency"
     t.index ["user_id"], name: "index_expenses_on_user_id"
   end
 
-  create_table "products", force: :cascade do |t|
-    t.string "name"
-    t.decimal "cogs"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "user_id"
-    t.index ["user_id"], name: "index_products_on_user_id"
-  end
-
-  create_table "sale_items", force: :cascade do |t|
-    t.bigint "product_id", null: false
-    t.bigint "sale_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "quantity", default: 0
-    t.decimal "price"
-    t.decimal "cogs"
-    t.index ["product_id"], name: "index_sale_items_on_product_id"
-    t.index ["sale_id"], name: "index_sale_items_on_sale_id"
-  end
-
-  create_table "sale_types", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table "revenue_snapshots", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.boolean "sync_to_xero"
-    t.string "xero_account_code"
-    t.string "xero_account_name"
-    t.string "xero_revenue_account_code"
-    t.index ["user_id"], name: "index_sale_types_on_user_id"
-  end
-
-  create_table "sales", force: :cascade do |t|
-    t.decimal "total_received"
-    t.integer "week_of_year"
+    t.date "period_start", null: false
+    t.date "period_end", null: false
+    t.decimal "gross_sales", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "net_sales", precision: 12, scale: 2, default: "0.0", null: false
+    t.integer "order_count", default: 0, null: false
+    t.datetime "fetched_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "product_id"
-    t.integer "quantity"
-    t.decimal "total_revenue"
-    t.integer "year"
-    t.date "sale_date"
-    t.bigint "sale_type_id"
-    t.string "old_sale_type"
-    t.bigint "user_id"
-    t.index ["product_id"], name: "index_sales_on_product_id"
-    t.index ["sale_type_id"], name: "index_sales_on_sale_type_id"
-    t.index ["user_id"], name: "index_sales_on_user_id"
+    t.index ["user_id", "period_start", "period_end"], name: "index_revenue_snapshots_on_user_and_period", unique: true
+    t.index ["user_id"], name: "index_revenue_snapshots_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -109,23 +102,29 @@ ActiveRecord::Schema[7.0].define(version: 2025_08_26_145400) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "xero_access_token"
-    t.text "xero_refresh_token"
-    t.datetime "xero_token_expires_at"
-    t.string "xero_tenant_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "woocommerce_configs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "store_url", null: false
+    t.text "consumer_key"
+    t.text "consumer_secret"
+    t.datetime "last_synced_at"
+    t.string "last_sync_status"
+    t.text "last_sync_error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_woocommerce_configs_on_user_id", unique: true
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "custom_periods", "users"
   add_foreign_key "expense_categories", "users"
   add_foreign_key "expenses", "expense_categories"
   add_foreign_key "expenses", "users"
-  add_foreign_key "products", "users"
-  add_foreign_key "sale_items", "products", on_delete: :cascade
-  add_foreign_key "sale_items", "sales", on_delete: :nullify
-  add_foreign_key "sale_types", "users"
-  add_foreign_key "sales", "products", on_delete: :cascade
-  add_foreign_key "sales", "sale_types"
-  add_foreign_key "sales", "users"
+  add_foreign_key "revenue_snapshots", "users"
+  add_foreign_key "woocommerce_configs", "users"
 end

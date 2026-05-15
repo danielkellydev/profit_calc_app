@@ -1,9 +1,20 @@
-<%= turbo_frame_tag 'custom' do %>
-  <%= render partial: 'custom_periods/show', locals: { 
-    custom_period: @custom_period, 
-    total_revenue: @total_revenue, 
-    cogs: @cogs, 
-    profit: @profit, 
-    sale_type_revenues: @sale_type_revenues 
-  } %>
-<% end %>
+<div class="container mx-auto px-4 py-6">
+  <h1 class="text-2xl font-bold mb-4 text-gray-900"><%= @custom_period.name %></h1>
+  <p class="text-sm text-gray-500 mb-4">
+    <%= @custom_period.start_date.strftime('%-d %b %Y') %> – <%= @custom_period.end_date.strftime('%-d %b %Y') %>
+  </p>
+
+  <div class="bg-white shadow-md rounded-lg p-6 space-y-2 max-w-lg">
+    <p>Revenue (Woo): <strong><%= number_to_currency(@revenue) %></strong></p>
+    <p>Expenses paid (annualised): <strong><%= number_to_currency(@total_paid) %></strong></p>
+    <p>Claimable expenses (annualised): <strong><%= number_to_currency(@total_claimable) %></strong></p>
+    <p>Net taxable: <strong class="<%= @net_profit.negative? ? 'text-red-600' : 'text-green-600' %>"><%= number_to_currency(@net_profit) %></strong></p>
+    <% if @snapshot.nil? %>
+      <p class="text-xs text-gray-500 pt-2">No revenue snapshot for this exact range. Use Dashboard → Refresh to populate.</p>
+    <% end %>
+  </div>
+
+  <div class="mt-6">
+    <%= link_to '← Back to custom periods', custom_periods_path, class: 'text-blue-600 hover:text-blue-900' %>
+  </div>
+</div>

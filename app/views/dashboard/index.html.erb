@@ -1,8 +1,81 @@
-<div>
+<div class="container mx-auto px-4 py-6 space-y-6">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900"><%= FinancialYear.label(@fy) %> Dashboard</h1>
+      <p class="text-sm text-gray-500">
+        <%= @fy.first.strftime('%-d %b %Y') %> – <%= @fy.last.strftime('%-d %b %Y') %>
+      </p>
+    </div>
 
-  <!-- Turbo Frame for rendering the content -->
-  <%= turbo_frame_tag 'content_frame' do %>
-    <%= render 'dashboard/weekly_data', total_revenue: @total_revenue, cogs: @cogs, profit: @profit, new_face_to_face_revenue: @new_face_to_face_revenue, return_face_to_face_revenue: @return_face_to_face_revenue, online_revenue: @online_revenue %>
-    <%= render 'sales/weekly_sales_record', sales: @sales %>
+    <div class="flex items-center gap-3">
+      <%= form_with url: dashboard_index_path, method: :get, local: true, class: 'flex items-center gap-2' do |f| %>
+        <%= f.label :fy, 'FY', class: 'text-sm text-gray-600' %>
+        <%= f.select :fy, fy_options(@fy), {}, { class: 'rounded-md border-gray-300 text-sm', onchange: 'this.form.submit()' } %>
+      <% end %>
+
+      <% if @woocommerce_configured %>
+        <%= button_to 'Refresh from Woo', refresh_woocommerce_dashboard_index_path(fy: FinancialYear.start_year(@fy)),
+              method: :post,
+              class: 'bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md' %>
+      <% else %>
+        <%= link_to 'Configure WooCommerce', edit_woocommerce_config_path,
+              class: 'bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md' %>
+      <% end %>
+
+      <%= link_to "Export receipts (zip)", receipts_export_path(fy: FinancialYear.start_year(@fy)),
+            class: 'bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-2 px-4 rounded-md' %>
+    </div>
+  </div>
+
+  <% if @snapshot.nil? && @woocommerce_configured %>
+    <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md text-sm">
+      No revenue data for this period yet. Click "Refresh from Woo" to pull totals.
+    </div>
   <% end %>
+
+  <% if current_user.woocommerce_config&.last_sync_status.in?(%w[auth_error unreachable]) %>
+    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
+      Last sync failed: <%= current_user.woocommerce_config.last_sync_error %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <%= render 'card', title: 'FY Revenue (Woo)', value: number_to_currency(@revenue), tone: 'green' %>
+    <%= render 'card', title: 'Total Expenses Paid', value: number_to_currency(@total_paid), tone: 'blue' %>
+    <%= render 'card', title: 'Claimable Expenses', value: number_to_currency(@total_claimable), tone: 'indigo' %>
+    <%= render 'card', title: 'Net Taxable Profit', value: number_to_currency(@net_profit), tone: @net_profit.negative? ? 'red' : 'purple' %>
+  </div>
+
+  <% if @snapshot %>
+    <p class="text-xs text-gray-500">
+      Revenue last synced <%= time_ago_in_words(@snapshot.fetched_at) %> ago
+      (<%= @snapshot.order_count %> orders, net <%= number_to_currency(@snapshot.net_sales) %>).
+    </p>
+  <% end %>
+
+  <div class="bg-white shadow-md rounded-lg p-4 sm:p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Claimable expenses by category</h2>
+    <% if @category_breakdown.any? %>
+      <table class="min-w-full text-sm">
+        <thead class="text-gray-500 text-xs uppercase">
+          <tr>
+            <th class="text-left py-2">Category</th>
+            <th class="text-right py-2">Monthly</th>
+            <th class="text-right py-2">% of total</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @category_breakdown.each do |row| %>
+            <tr>
+              <td class="py-2"><%= row[:name] %></td>
+              <td class="py-2 text-right"><%= number_to_currency(row[:amount]) %></td>
+              <td class="py-2 text-right"><%= row[:percentage] %>%</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="text-gray-500 text-sm">No expenses recorded for this period yet.</p>
+    <% end %>
+  </div>
 </div>

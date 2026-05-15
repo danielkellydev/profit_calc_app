@@ -1,0 +1,50 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md p-6" data-controller="woo-test">
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">WooCommerce settings</h1>
+    <p class="text-sm text-gray-500 mb-6">
+      Generate a read-only REST API key in your WooCommerce store under
+      <em>Settings → Advanced → REST API</em>, then paste the consumer key and secret here.
+    </p>
+
+    <%= form_with model: @config, url: woocommerce_config_path, method: :patch, local: true, class: "space-y-4" do |form| %>
+      <% if @config.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-3">
+          <p class="text-red-800 text-sm font-medium">Please fix:</p>
+          <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+            <% @config.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :store_url, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.url_field :store_url, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm", placeholder: "https://yourstore.com" %>
+      </div>
+
+      <div>
+        <%= form.label :consumer_key, "Consumer key", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :consumer_key, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono", autocomplete: "off" %>
+      </div>
+
+      <div>
+        <%= form.label :consumer_secret, "Consumer secret", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.password_field :consumer_secret, value: @config.consumer_secret, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm font-mono", autocomplete: "off" %>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pt-2">
+        <div class="flex items-center gap-2">
+          <button type="button" data-action="woo-test#run" class="bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium py-2 px-4 rounded">
+            Test connection
+          </button>
+          <span data-woo-test-target="status" class="text-sm"></span>
+        </div>
+        <div class="flex gap-2">
+          <%= link_to "Cancel", settings_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium py-2 px-4 rounded" %>
+          <%= form.submit "Save", class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

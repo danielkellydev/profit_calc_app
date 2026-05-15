@@ -47,6 +47,6 @@ class ExpenseCategoriesController < ApplicationController
   end
 
   def expense_category_params
-    params.require(:expense_category).permit(:name, :description)
+    params.require(:expense_category).permit(:name, :description, :business_use_percentage)
   end
 end
