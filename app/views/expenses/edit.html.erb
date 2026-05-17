@@ -1,6 +1,6 @@
-<div class="container mx-auto px-4 py-6 sm:py-8">
-  <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
-    <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit expense</h1>
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded-xl ring-1 ring-zinc-200 p-4 sm:p-6">
+    <h1 class="font-display text-2xl font-bold text-zinc-900 mb-6">Edit expense</h1>
     <%= render 'form', expense: @expense, expense_categories: @expense_categories, submit_label: 'Update expense', cancel_path: expenses_path %>
   </div>
 </div>

@@ -1,103 +1,171 @@
-<div class="container mx-auto px-4 py-6 sm:py-8">
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Expenses</h1>
-    <div class="flex gap-2">
+<div class="space-y-6">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <div>
+      <h1 class="font-display text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Expenses</h1>
+      <p class="text-sm text-zinc-500"><%= FinancialYear.label(@fy) %> · <%= @fy.first.strftime('%-d %b %Y') %> – <%= @fy.last.strftime('%-d %b %Y') %></p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <%= form_with url: expenses_path, method: :get, local: true, class: 'flex items-center gap-2' do |f| %>
+        <%= f.label :fy, 'FY', class: 'text-sm text-zinc-600' %>
+        <%= f.select :fy, fy_options(@fy), {}, { class: 'rounded-lg border-zinc-300 text-sm focus:border-zinc-900 focus:ring-zinc-900', onchange: 'this.form.submit()' } %>
+      <% end %>
       <%= link_to "Categories", expense_categories_path,
-            class: "bg-gray-500 hover:bg-gray-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+            class: "bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-900 text-sm font-medium py-2 px-3.5 rounded-lg" %>
       <%= link_to "Dashboard", dashboard_index_path,
-            class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+            class: "bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2 px-3.5 rounded-lg" %>
     </div>
   </div>
 
   <% if @expense_categories.empty? %>
-    <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6 text-yellow-800 text-sm">
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm">
       You need at least one expense category before adding expenses.
       <%= link_to "Create one →", new_expense_category_path, class: "underline font-medium" %>
     </div>
   <% else %>
-    <div class="bg-white shadow-md rounded-lg p-4 sm:p-6 mb-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-3">Quick add</h2>
-      <%= render 'form', expense: @new_expense, expense_categories: @expense_categories, submit_label: 'Add expense', cancel_path: nil, compact: true %>
+    <div class="bg-white rounded-xl ring-1 ring-zinc-200 p-4 sm:p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display text-lg font-semibold text-zinc-900">Log a one-off purchase</h2>
+        <span class="text-xs text-zinc-400">Most expenses go here</span>
+      </div>
+      <%= render 'quick_add_one_off', expense: @new_one_off, expense_categories: @expense_categories %>
     </div>
   <% end %>
 
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-    <%= render 'summary_card', title: 'Weekly',            value: @total_weekly_expenses,    tone: 'green' %>
-    <%= render 'summary_card', title: 'Monthly',           value: @total_monthly_expenses,   tone: 'blue' %>
-    <%= render 'summary_card', title: 'Annual',            value: @total_annual_expenses,    tone: 'purple' %>
-    <%= render 'summary_card', title: 'Claimable Annual',  value: @total_claimable_annual,   tone: 'indigo' %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <%= render 'summary_card', title: "Claimable #{FinancialYear.label(@fy)}", value: @claimable_fy_total, accent: 'accent' %>
+    <%= render 'summary_card', title: "One-offs #{FinancialYear.label(@fy)}",  value: @one_off_fy_total,   accent: 'positive' %>
   </div>
 
-  <% if @expenses_by_category.any? %>
-    <% @expenses_by_category.each do |category, expenses| %>
-      <div class="bg-white shadow-md rounded-lg mb-6 overflow-hidden">
-        <div class="bg-gray-50 px-4 sm:px-6 py-4 border-b flex justify-between items-center">
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900">
-              <%= category.name %>
-              <span class="text-xs text-gray-500 font-normal ml-2">
-                default <%= number_with_precision(category.business_use_percentage, strip_insignificant_zeros: true) %>% business use
-              </span>
-            </h2>
-            <% if category.description.present? %>
-              <p class="text-sm text-gray-600 mt-1"><%= category.description %></p>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
-              <tr>
-                <th class="px-4 py-2 text-left">Name</th>
-                <th class="px-4 py-2 text-right">Amount</th>
-                <th class="px-4 py-2 text-left">Frequency</th>
-                <th class="px-4 py-2 text-right">Business use</th>
-                <th class="px-4 py-2 text-right">Claimable / month</th>
-                <th class="px-4 py-2 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-100">
-              <% expenses.each do |expense| %>
-                <tr class="<%= 'opacity-60' unless expense.active %>">
-                  <td class="px-4 py-2 font-medium text-gray-900">
-                    <%= expense.name %>
-                    <% if expense.receipts.attached? %>
-                      <span class="ml-1 text-xs text-gray-500" title="<%= expense.receipts.size %> receipt(s) attached">📎<%= expense.receipts.size %></span>
-                    <% end %>
-                  </td>
-                  <td class="px-4 py-2 text-right"><%= number_to_currency(expense.amount) %></td>
-                  <td class="px-4 py-2">
-                    <%= expense.frequency == 'one_off' ? 'One-off' : expense.frequency.capitalize %>
-                    <% if expense.one_off? && expense.start_date %>
-                      <span class="block text-xs text-gray-500"><%= expense.start_date.strftime('%-d %b %Y') %></span>
-                    <% end %>
-                  </td>
-                  <td class="px-4 py-2 text-right">
-                    <%= number_with_precision(expense.effective_business_use_percentage, strip_insignificant_zeros: true) %>%
-                    <% if expense.business_use_percentage_overridden? %>
-                      <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-800">override</span>
-                    <% end %>
-                  </td>
-                  <td class="px-4 py-2 text-right font-medium text-indigo-700">
-                    <%= number_to_currency(expense.claimable_monthly_amount) %>
-                  </td>
-                  <td class="px-4 py-2 text-right whitespace-nowrap">
-                    <%= link_to "Edit", edit_expense_path(expense), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
-                    <%= button_to "Delete", expense_path(expense), method: :delete,
-                          form: { data: { turbo_confirm: 'Delete this expense?' } },
-                          class: "text-red-600 hover:text-red-900 bg-transparent p-0 border-0 cursor-pointer inline" %>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
+  <section class="bg-white rounded-xl ring-1 ring-zinc-200 overflow-hidden">
+    <div class="px-4 sm:px-6 py-4 border-b border-zinc-200 flex items-center justify-between">
+      <div>
+        <h2 class="font-display text-lg font-semibold text-zinc-900">One-off purchases</h2>
+        <p class="text-xs text-zinc-500"><%= pluralize(@one_offs.size, 'purchase') %> in <%= FinancialYear.label(@fy) %></p>
       </div>
-    <% end %>
-  <% else %>
-    <div class="bg-white shadow-md rounded-lg p-8 text-center text-gray-500">
-      No expenses yet. Add your first one above.
     </div>
-  <% end %>
+
+    <% if @one_offs.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-200 text-sm">
+          <thead class="bg-zinc-50/50 text-xs text-zinc-500 uppercase tracking-wider">
+            <tr>
+              <th class="px-4 py-2.5 text-left font-medium">Date</th>
+              <th class="px-4 py-2.5 text-left font-medium">Name</th>
+              <th class="px-4 py-2.5 text-left font-medium">Category</th>
+              <th class="px-4 py-2.5 text-right font-medium">Amount</th>
+              <th class="px-4 py-2.5 text-right font-medium">Claimable</th>
+              <th class="px-4 py-2.5 text-center font-medium">Receipt</th>
+              <th class="px-4 py-2.5 text-right font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-zinc-100">
+            <% @one_offs.each do |expense| %>
+              <tr class="hover:bg-zinc-50/50 transition">
+                <td class="px-4 py-2.5 whitespace-nowrap text-zinc-700 tabular-nums"><%= expense.start_date&.strftime('%-d %b %Y') %></td>
+                <td class="px-4 py-2.5 font-medium text-zinc-900"><%= expense.name %></td>
+                <td class="px-4 py-2.5 text-zinc-600"><%= expense.expense_category.name %></td>
+                <td class="px-4 py-2.5 text-right tabular-nums text-zinc-900"><%= number_to_currency(expense.amount) %></td>
+                <td class="px-4 py-2.5 text-right tabular-nums font-medium text-lime-700">
+                  <%= number_to_currency(expense.claimable_amount) %>
+                  <% if expense.effective_business_use_percentage != 100 %>
+                    <span class="block text-xs font-normal text-zinc-400"><%= number_with_precision(expense.effective_business_use_percentage, strip_insignificant_zeros: true) %>%</span>
+                  <% end %>
+                </td>
+                <td class="px-4 py-2.5 text-center">
+                  <% if expense.receipts.attached? %>
+                    <span class="inline-flex items-center text-xs text-zinc-600" title="<%= expense.receipts.size %> receipt(s)">📎 <%= expense.receipts.size %></span>
+                  <% else %>
+                    <span class="inline-flex items-center text-xs text-amber-600" title="No receipt attached">⚠︎</span>
+                  <% end %>
+                </td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap">
+                  <%= link_to "Edit", edit_expense_path(expense), class: "text-zinc-700 hover:text-zinc-900 font-medium mr-3" %>
+                  <%= button_to "Delete", expense_path(expense), method: :delete,
+                        form: { data: { turbo_confirm: 'Delete this expense?' } },
+                        class: "text-rose-600 hover:text-rose-800 font-medium bg-transparent p-0 border-0 cursor-pointer inline" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="px-4 sm:px-6 py-10 text-center text-sm text-zinc-500">No one-off purchases logged for <%= FinancialYear.label(@fy) %> yet.</p>
+    <% end %>
+  </section>
+
+  <details class="bg-white rounded-xl ring-1 ring-zinc-200 overflow-hidden group">
+    <summary class="px-4 sm:px-6 py-4 cursor-pointer list-none flex items-center justify-between gap-3 hover:bg-zinc-50/50 transition">
+      <div class="min-w-0">
+        <h2 class="font-display text-lg font-semibold text-zinc-900 flex items-center gap-2">
+          <span class="text-zinc-400 group-open:rotate-90 transition-transform inline-block">▸</span>
+          Recurring expenses
+          <span class="text-xs text-zinc-500 font-normal font-sans">(<%= @recurring_count %> active)</span>
+        </h2>
+        <p class="text-xs text-zinc-500 ml-6">Set-and-forget bills · <span class="tabular-nums"><%= number_to_currency(@recurring_annual_total) %></span> claimable per FY</p>
+      </div>
+      <span class="text-xs text-zinc-500 group-open:hidden">Show</span>
+      <span class="text-xs text-zinc-500 hidden group-open:inline">Hide</span>
+    </summary>
+
+    <div class="border-t border-zinc-200 divide-y divide-zinc-100">
+      <% if @recurring_by_category.any? %>
+        <% @recurring_by_category.each do |category, expenses| %>
+          <div>
+            <div class="px-4 sm:px-6 py-3 bg-zinc-50/60 flex justify-between items-center">
+              <h3 class="text-sm font-semibold text-zinc-700">
+                <%= category.name %>
+                <span class="text-xs text-zinc-400 font-normal ml-2">
+                  default <%= number_with_precision(category.business_use_percentage, strip_insignificant_zeros: true) %>% business use
+                </span>
+              </h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead class="text-xs text-zinc-500 uppercase tracking-wider">
+                  <tr>
+                    <th class="px-4 py-2 text-left font-medium">Name</th>
+                    <th class="px-4 py-2 text-right font-medium">Amount</th>
+                    <th class="px-4 py-2 text-left font-medium">Frequency</th>
+                    <th class="px-4 py-2 text-right font-medium">Business use</th>
+                    <th class="px-4 py-2 text-right font-medium">Claimable / month</th>
+                    <th class="px-4 py-2 text-right font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-100">
+                  <% expenses.each do |expense| %>
+                    <tr class="<%= 'opacity-60' unless expense.active %> hover:bg-zinc-50/50 transition">
+                      <td class="px-4 py-2.5 font-medium text-zinc-900"><%= expense.name %></td>
+                      <td class="px-4 py-2.5 text-right tabular-nums text-zinc-900"><%= number_to_currency(expense.amount) %></td>
+                      <td class="px-4 py-2.5 text-zinc-700"><%= expense.frequency.capitalize %></td>
+                      <td class="px-4 py-2.5 text-right tabular-nums text-zinc-700">
+                        <%= number_with_precision(expense.effective_business_use_percentage, strip_insignificant_zeros: true) %>%
+                        <% if expense.business_use_percentage_overridden? %>
+                          <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-amber-100 text-amber-900">override</span>
+                        <% end %>
+                      </td>
+                      <td class="px-4 py-2.5 text-right tabular-nums font-medium text-lime-700">
+                        <%= number_to_currency(expense.claimable_monthly_amount) %>
+                      </td>
+                      <td class="px-4 py-2.5 text-right whitespace-nowrap">
+                        <%= link_to "Edit", edit_expense_path(expense), class: "text-zinc-700 hover:text-zinc-900 font-medium mr-3" %>
+                        <%= button_to "Delete", expense_path(expense), method: :delete,
+                              form: { data: { turbo_confirm: 'Delete this expense?' } },
+                              class: "text-rose-600 hover:text-rose-800 font-medium bg-transparent p-0 border-0 cursor-pointer inline" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="px-4 sm:px-6 py-8 text-center text-sm text-zinc-500">
+          No recurring expenses yet.
+          <%= link_to "Add one →", new_expense_path, class: "text-zinc-900 font-medium underline underline-offset-2" %>
+        </p>
+      <% end %>
+    </div>
+  </details>
 </div>

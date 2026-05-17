@@ -1,36 +1,36 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="max-w-lg mx-auto bg-white shadow-lg rounded-lg p-6">
-    <h1 class="text-2xl font-semibold mb-6 text-gray-900">New custom period</h1>
+<div class="max-w-xl mx-auto">
+  <div class="bg-white rounded-xl ring-1 ring-zinc-200 p-4 sm:p-6">
+    <h1 class="font-display text-2xl font-bold text-zinc-900 mb-6">New custom period</h1>
 
     <%= form_with(model: @custom_period, local: true, class: "space-y-4") do |form| %>
       <% if @custom_period.errors.any? %>
-        <div class="bg-red-50 border border-red-200 rounded-md p-3">
-          <p class="text-red-800 text-sm font-medium">Please fix:</p>
-          <ul class="mt-1 text-sm text-red-700 list-disc list-inside">
+        <div class="bg-rose-50 border border-rose-200 rounded-lg p-3">
+          <p class="text-rose-900 text-sm font-semibold">Please fix:</p>
+          <ul class="mt-1 text-sm text-rose-800 list-disc list-inside space-y-0.5">
             <% @custom_period.errors.full_messages.each do |m| %><li><%= m %></li><% end %>
           </ul>
         </div>
       <% end %>
 
       <div>
-        <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
-        <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+        <%= form.label :name, class: "block text-sm font-medium text-zinc-700" %>
+        <%= form.text_field :name, class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <%= form.label :start_date, class: "block text-sm font-medium text-gray-700" %>
-          <%= form.date_field :start_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+          <%= form.label :start_date, class: "block text-sm font-medium text-zinc-700" %>
+          <%= form.date_field :start_date, class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
         </div>
         <div>
-          <%= form.label :end_date, class: "block text-sm font-medium text-gray-700" %>
-          <%= form.date_field :end_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm" %>
+          <%= form.label :end_date, class: "block text-sm font-medium text-zinc-700" %>
+          <%= form.date_field :end_date, class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
         </div>
       </div>
 
-      <div class="flex justify-end gap-2 pt-2">
-        <%= link_to "Cancel", custom_periods_path, class: "bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium py-2 px-4 rounded" %>
-        <%= form.submit "Create custom period", class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+      <div class="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2">
+        <%= link_to "Cancel", custom_periods_path, class: "bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-900 text-sm font-medium py-2 px-4 rounded-lg text-center" %>
+        <%= form.submit "Create custom period", class: "bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2 px-4 rounded-lg cursor-pointer" %>
       </div>
     <% end %>
   </div>

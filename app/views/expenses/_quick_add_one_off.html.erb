@@ -1,0 +1,63 @@
+<%= form_with model: expense, local: true, class: "space-y-3" do |form| %>
+  <%= form.hidden_field :frequency, value: 'one_off' %>
+  <%= form.hidden_field :active, value: true %>
+
+  <% if expense.errors.any? %>
+    <div class="bg-rose-50 border border-rose-200 rounded-lg p-3">
+      <p class="text-rose-900 text-sm font-semibold">Please fix:</p>
+      <ul class="mt-1 text-sm text-rose-800 list-disc list-inside space-y-0.5">
+        <% expense.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+    <div class="md:col-span-4">
+      <%= form.label :name, "What", class: "block text-xs font-medium text-zinc-600" %>
+      <%= form.text_field :name, autofocus: true, autocomplete: "off",
+            class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm text-sm focus:border-zinc-900 focus:ring-zinc-900",
+            placeholder: "e.g. Timber, screws, Bunnings" %>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= form.label :amount, "Amount", class: "block text-xs font-medium text-zinc-600" %>
+      <div class="relative mt-1">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-zinc-400 text-sm">$</span>
+        <%= form.number_field :amount, step: 0.01, inputmode: "decimal",
+              class: "block w-full rounded-lg border-zinc-300 shadow-sm text-sm pl-6 tabular-nums focus:border-zinc-900 focus:ring-zinc-900",
+              placeholder: "0.00" %>
+      </div>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= form.label :start_date, "Date", class: "block text-xs font-medium text-zinc-600" %>
+      <%= form.date_field :start_date,
+            class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm text-sm focus:border-zinc-900 focus:ring-zinc-900" %>
+    </div>
+
+    <div class="md:col-span-3">
+      <%= form.label :expense_category_id, "Category", class: "block text-xs font-medium text-zinc-600" %>
+      <%= form.select :expense_category_id,
+            options_from_collection_for_select(expense_categories, :id, :name, expense.expense_category_id),
+            { prompt: "Select" },
+            { class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm text-sm focus:border-zinc-900 focus:ring-zinc-900" } %>
+    </div>
+
+    <div class="md:col-span-1">
+      <%= form.submit "Add",
+            class: "w-full bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2.5 px-3 rounded-lg cursor-pointer transition" %>
+    </div>
+  </div>
+
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-1">
+    <label class="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer">
+      <span class="text-zinc-500">Receipt:</span>
+      <%= form.file_field :receipts, multiple: true, accept: "application/pdf,image/*",
+            class: "text-sm text-zinc-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-zinc-100 file:text-zinc-900 hover:file:bg-zinc-200" %>
+    </label>
+    <%= link_to "Add a recurring expense instead →", new_expense_path,
+          class: "text-xs text-zinc-500 hover:text-zinc-900 underline underline-offset-2" %>
+  </div>
+<% end %>

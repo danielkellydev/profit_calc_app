@@ -1,29 +1,29 @@
-<div class="space-y-3 text-sm">
+<div class="flex flex-col gap-2 text-sm text-center">
   <%- if controller_name != 'sessions' %>
-    <%= link_to "Log in", new_session_path(resource_name), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+    <%= link_to "Log in", new_session_path(resource_name), class: "text-zinc-700 hover:text-zinc-900 font-medium underline-offset-4 hover:underline" %>
   <% end %>
 
   <%- if devise_mapping.registerable? && controller_name != 'registrations' %>
-    <%= link_to "Sign up", new_registration_path(resource_name), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+    <%= link_to "Create an account", new_registration_path(resource_name), class: "text-zinc-700 hover:text-zinc-900 font-medium underline-offset-4 hover:underline" %>
   <% end %>
 
   <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-    <%= link_to "Forgot your password?", new_password_path(resource_name), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+    <%= link_to "Forgot your password?", new_password_path(resource_name), class: "text-zinc-700 hover:text-zinc-900 font-medium underline-offset-4 hover:underline" %>
   <% end %>
 
   <%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
-    <%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+    <%= link_to "Resend confirmation instructions", new_confirmation_path(resource_name), class: "text-zinc-700 hover:text-zinc-900 font-medium underline-offset-4 hover:underline" %>
   <% end %>
 
   <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
-    <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name), class: "text-blue-600 hover:text-blue-800 font-medium" %>
+    <%= link_to "Resend unlock instructions", new_unlock_path(resource_name), class: "text-zinc-700 hover:text-zinc-900 font-medium underline-offset-4 hover:underline" %>
   <% end %>
 
   <%- if devise_mapping.omniauthable? %>
     <%- resource_class.omniauth_providers.each do |provider| %>
-      <%= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), 
-          data: { turbo: false }, 
-          class: "w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded mt-3" %>
+      <%= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider),
+            data: { turbo: false },
+            class: "w-full bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-900 font-medium py-2 px-4 rounded-lg mt-2" %>
     <% end %>
   <% end %>
 </div>

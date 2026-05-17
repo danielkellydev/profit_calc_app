@@ -1,17 +1,27 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
   <div class="text-center">
-    <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-      <span class="block">Welcome to ProfitCalc</span>
+    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-lime-100 text-lime-900 text-xs font-medium tracking-wide uppercase">
+      Books for sole traders
+    </span>
+    <h1 class="mt-6 font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-zinc-900">
+      Tax time, <span class="text-zinc-400">without the panic.</span>
     </h1>
-    <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-      Track expenses, pull revenue from WooCommerce, and see your net taxable profit at a glance.
+    <p class="mt-5 max-w-xl mx-auto text-base sm:text-lg text-zinc-600">
+      Log one-off purchases as they happen, sync your WooCommerce revenue,
+      and see your net taxable profit at a glance.
     </p>
-    <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+
+    <div class="mt-8 flex flex-col sm:flex-row sm:justify-center gap-3">
       <% if user_signed_in? %>
-        <%= link_to "Go to Dashboard", dashboard_index_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
+        <%= link_to "Go to dashboard", dashboard_index_path,
+              class: "inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold transition" %>
+        <%= link_to "Log an expense", expenses_path,
+              class: "inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm font-semibold transition" %>
       <% else %>
-        <%= link_to "Sign Up", new_user_registration_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700" %>
-        <%= link_to "Log In", new_user_session_path, class: "inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 ml-3" %>
+        <%= link_to "Create an account", new_user_registration_path,
+              class: "inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold transition" %>
+        <%= link_to "Log in", new_user_session_path,
+              class: "inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-900 text-sm font-semibold transition" %>
       <% end %>
     </div>
   </div>

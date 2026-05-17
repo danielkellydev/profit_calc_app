@@ -1,20 +1,36 @@
-<div class="container mx-auto px-4 py-6">
-  <h1 class="text-2xl font-bold mb-4 text-gray-900"><%= @custom_period.name %></h1>
-  <p class="text-sm text-gray-500 mb-4">
-    <%= @custom_period.start_date.strftime('%-d %b %Y') %> – <%= @custom_period.end_date.strftime('%-d %b %Y') %>
-  </p>
+<div class="space-y-6">
+  <div>
+    <h1 class="font-display text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight"><%= @custom_period.name %></h1>
+    <p class="text-sm text-zinc-500">
+      <%= @custom_period.start_date.strftime('%-d %b %Y') %> – <%= @custom_period.end_date.strftime('%-d %b %Y') %>
+    </p>
+  </div>
 
-  <div class="bg-white shadow-md rounded-lg p-6 space-y-2 max-w-lg">
-    <p>Revenue (Woo): <strong><%= number_to_currency(@revenue) %></strong></p>
-    <p>Expenses paid (annualised): <strong><%= number_to_currency(@total_paid) %></strong></p>
-    <p>Claimable expenses (annualised): <strong><%= number_to_currency(@total_claimable) %></strong></p>
-    <p>Net taxable: <strong class="<%= @net_profit.negative? ? 'text-red-600' : 'text-green-600' %>"><%= number_to_currency(@net_profit) %></strong></p>
+  <div class="bg-white rounded-xl ring-1 ring-zinc-200 p-5 sm:p-6 max-w-lg">
+    <dl class="divide-y divide-zinc-100 text-sm">
+      <div class="flex justify-between py-2.5">
+        <dt class="text-zinc-600">Revenue (Woo)</dt>
+        <dd class="font-medium tabular-nums text-zinc-900"><%= number_to_currency(@revenue) %></dd>
+      </div>
+      <div class="flex justify-between py-2.5">
+        <dt class="text-zinc-600">Expenses paid (annualised)</dt>
+        <dd class="font-medium tabular-nums text-zinc-900"><%= number_to_currency(@total_paid) %></dd>
+      </div>
+      <div class="flex justify-between py-2.5">
+        <dt class="text-zinc-600">Claimable (annualised)</dt>
+        <dd class="font-medium tabular-nums text-lime-700"><%= number_to_currency(@total_claimable) %></dd>
+      </div>
+      <div class="flex justify-between py-2.5">
+        <dt class="text-zinc-900 font-medium">Net taxable</dt>
+        <dd class="font-semibold tabular-nums <%= @net_profit.negative? ? 'text-rose-700' : 'text-emerald-700' %>"><%= number_to_currency(@net_profit) %></dd>
+      </div>
+    </dl>
     <% if @snapshot.nil? %>
-      <p class="text-xs text-gray-500 pt-2">No revenue snapshot for this exact range. Use Dashboard → Refresh to populate.</p>
+      <p class="text-xs text-zinc-500 pt-3 mt-2 border-t border-zinc-100">No revenue snapshot for this exact range. Use Dashboard → Refresh to populate.</p>
     <% end %>
   </div>
 
-  <div class="mt-6">
-    <%= link_to '← Back to custom periods', custom_periods_path, class: 'text-blue-600 hover:text-blue-900' %>
+  <div>
+    <%= link_to '← Back to custom periods', custom_periods_path, class: 'text-zinc-700 hover:text-zinc-900 font-medium underline underline-offset-2' %>
   </div>
 </div>

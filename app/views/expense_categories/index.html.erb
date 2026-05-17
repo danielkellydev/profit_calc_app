@@ -1,49 +1,51 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Expense categories</h1>
+<div class="space-y-6">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <h1 class="font-display text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Expense categories</h1>
     <%= link_to "New category", new_expense_category_path,
-          class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded" %>
+          class: "bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2 px-3.5 rounded-lg self-start sm:self-auto" %>
   </div>
 
-  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+  <div class="bg-white rounded-xl ring-1 ring-zinc-200 overflow-hidden">
     <% if @expense_categories.any? %>
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
-          <tr>
-            <th class="px-4 py-2 text-left">Name</th>
-            <th class="px-4 py-2 text-left">Description</th>
-            <th class="px-4 py-2 text-right">Default business use %</th>
-            <th class="px-4 py-2 text-right">Expenses</th>
-            <th class="px-4 py-2 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <% @expense_categories.each do |category| %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-200 text-sm">
+          <thead class="bg-zinc-50/50 text-xs text-zinc-500 uppercase tracking-wider">
             <tr>
-              <td class="px-4 py-2 font-medium text-gray-900"><%= category.name %></td>
-              <td class="px-4 py-2 text-gray-500"><%= truncate(category.description, length: 60) %></td>
-              <td class="px-4 py-2 text-right"><%= number_with_precision(category.business_use_percentage, strip_insignificant_zeros: true) %>%</td>
-              <td class="px-4 py-2 text-right text-gray-500"><%= category.expenses.count %></td>
-              <td class="px-4 py-2 text-right whitespace-nowrap">
-                <%= link_to "Edit", edit_expense_category_path(category), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
-                <%= button_to "Delete", expense_category_path(category), method: :delete,
-                      form: { data: { turbo_confirm: 'Delete category and all its expenses?' } },
-                      class: "text-red-600 hover:text-red-900 bg-transparent p-0 border-0 cursor-pointer inline" %>
-              </td>
+              <th class="px-4 py-2.5 text-left font-medium">Name</th>
+              <th class="px-4 py-2.5 text-left font-medium">Description</th>
+              <th class="px-4 py-2.5 text-right font-medium">Default business use</th>
+              <th class="px-4 py-2.5 text-right font-medium">Expenses</th>
+              <th class="px-4 py-2.5 text-right font-medium">Actions</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="bg-white divide-y divide-zinc-100">
+            <% @expense_categories.each do |category| %>
+              <tr class="hover:bg-zinc-50/50 transition">
+                <td class="px-4 py-2.5 font-medium text-zinc-900"><%= category.name %></td>
+                <td class="px-4 py-2.5 text-zinc-500"><%= truncate(category.description, length: 60) %></td>
+                <td class="px-4 py-2.5 text-right tabular-nums text-zinc-900"><%= number_with_precision(category.business_use_percentage, strip_insignificant_zeros: true) %>%</td>
+                <td class="px-4 py-2.5 text-right tabular-nums text-zinc-500"><%= category.expenses.count %></td>
+                <td class="px-4 py-2.5 text-right whitespace-nowrap">
+                  <%= link_to "Edit", edit_expense_category_path(category), class: "text-zinc-700 hover:text-zinc-900 font-medium mr-3" %>
+                  <%= button_to "Delete", expense_category_path(category), method: :delete,
+                        form: { data: { turbo_confirm: 'Delete category and all its expenses?' } },
+                        class: "text-rose-600 hover:text-rose-800 font-medium bg-transparent p-0 border-0 cursor-pointer inline" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
-      <div class="text-center py-8">
-        <p class="text-gray-500 text-lg">No categories yet.</p>
+      <div class="text-center py-10 px-4">
+        <p class="text-zinc-500">No categories yet.</p>
         <%= link_to "Create your first category", new_expense_category_path,
-              class: "mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block" %>
+              class: "mt-4 inline-block bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2 px-4 rounded-lg" %>
       </div>
     <% end %>
   </div>
 
-  <div class="mt-6">
-    <%= link_to "← Back to expenses", expenses_path, class: "text-blue-600 hover:text-blue-900" %>
+  <div>
+    <%= link_to "← Back to expenses", expenses_path, class: "text-zinc-700 hover:text-zinc-900 font-medium underline underline-offset-2" %>
   </div>
 </div>

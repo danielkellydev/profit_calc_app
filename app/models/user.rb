@@ -31,11 +31,13 @@ class User < ApplicationRecord
   end
 
   def expense_breakdown_percentage(start_date = nil, end_date = nil)
-    total = claimable_monthly_expenses(start_date, end_date)
+    scope = start_date && end_date ? expenses.for_period(start_date, end_date) : expenses.active
+    expenses_in_scope = scope.includes(:expense_category).to_a
+    total = expenses_in_scope.sum(&:claimable_annual_amount)
     return [] if total.zero?
 
-    expense_categories.includes(:expenses).map do |category|
-      category_total = category.expenses.active.sum(&:claimable_monthly_amount)
+    expenses_in_scope.group_by(&:expense_category).map do |category, exps|
+      category_total = exps.sum(&:claimable_annual_amount)
       {
         name: category.name,
         percentage: (category_total / total * 100).round(1),

@@ -1,4 +1,13 @@
-<div class="bg-white shadow rounded-lg p-3 sm:p-4">
-  <p class="text-xs uppercase tracking-wide text-gray-500"><%= title %></p>
-  <p class="mt-1 text-lg sm:text-xl font-bold text-<%= tone %>-600"><%= number_to_currency(value) %></p>
+<%
+  accent ||= 'neutral'
+  value_class = case accent
+                when 'positive' then 'text-emerald-700'
+                when 'negative' then 'text-rose-700'
+                when 'accent'   then 'text-lime-600'
+                else                 'text-zinc-900'
+                end
+%>
+<div class="bg-white rounded-xl ring-1 ring-zinc-200 p-4 sm:p-5">
+  <p class="text-xs uppercase tracking-wider font-medium text-zinc-500"><%= title %></p>
+  <p class="mt-1 font-display text-xl sm:text-2xl font-semibold tabular-nums <%= value_class %>"><%= number_to_currency(value) %></p>
 </div>

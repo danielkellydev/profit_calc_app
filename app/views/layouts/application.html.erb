@@ -1,51 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
-    <title>ProfitCalcApp</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Soly</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#18181b">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💲</text></svg>">
-    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
-
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2318181b%22/><text x=%2250%22 y=%2272%22 font-size=%2270%22 font-family=%22-apple-system,system-ui,sans-serif%22 font-weight=%22700%22 text-anchor=%22middle%22 fill=%22%23a3e635%22>S</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <nav class="bg-gray-800 w-full">
+  <body class="min-h-full bg-zinc-50 text-zinc-900 antialiased font-sans">
+    <nav class="bg-zinc-900 text-zinc-200 border-b border-zinc-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <div class="flex items-center">
-            <a href="/" class="text-white text-xl font-bold">ProfitCalc</a>
-          </div>
+        <div class="flex items-center justify-between h-14">
+          <a href="/" class="flex items-center gap-2 font-display font-bold text-lg text-white tracking-tight">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-lime-400 text-zinc-900 font-bold">S</span>
+            Soly
+          </a>
 
-          <!-- Desktop Navigation -->
-          <div class="hidden md:block">
-            <div class="ml-10 flex items-baseline space-x-4">
-              <% if user_signed_in? %>
-                <%= link_to 'Expenses', expenses_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
-                <%= link_to 'Dashboard', dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
+          <div class="hidden md:flex items-center gap-1">
+            <% if user_signed_in? %>
+              <%= link_to 'Expenses',  expenses_path,        class: 'text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-2 rounded-md text-sm font-medium transition' %>
+              <%= link_to 'Dashboard', dashboard_index_path, class: 'text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-2 rounded-md text-sm font-medium transition' %>
 
-                <div class="relative" data-controller="dropdown">
-                  <button data-action="click->dropdown#toggle" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    Menu
-                  </button>
-                  <div data-dropdown-target="menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
-                    <%= link_to 'Settings', settings_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
-                    <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100' %>
-                  </div>
+              <div class="relative" data-controller="dropdown">
+                <button data-action="click->dropdown#toggle" class="text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-2 rounded-md text-sm font-medium transition flex items-center gap-1">
+                  Menu
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                </button>
+                <div data-dropdown-target="menu" class="absolute right-0 mt-2 w-48 bg-white text-zinc-900 rounded-lg shadow-lg ring-1 ring-zinc-900/5 py-1 z-50 hidden">
+                  <%= link_to 'Settings', settings_path, class: 'block px-4 py-2 text-sm hover:bg-zinc-50' %>
+                  <%= button_to 'Sign out', destroy_user_session_path, method: :delete, class: 'w-full text-left px-4 py-2 text-sm hover:bg-zinc-50' %>
                 </div>
-              <% else %>
-                <%= link_to 'Login', new_user_session_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
-                <%= link_to 'Sign Up', new_user_registration_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium' %>
-              <% end %>
-            </div>
+              </div>
+            <% else %>
+              <%= link_to 'Log in',  new_user_session_path,      class: 'text-zinc-300 hover:text-white hover:bg-zinc-800 px-3 py-2 rounded-md text-sm font-medium transition' %>
+              <%= link_to 'Sign up', new_user_registration_path, class: 'bg-lime-400 hover:bg-lime-300 text-zinc-900 px-3 py-2 rounded-md text-sm font-semibold transition' %>
+            <% end %>
           </div>
 
-          <!-- Mobile menu button -->
           <div class="md:hidden relative" data-controller="dropdown">
-            <button data-action="click->dropdown#toggle" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+            <button data-action="click->dropdown#toggle" class="inline-flex items-center justify-center p-2 rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-lime-400">
               <span class="sr-only">Open main menu</span>
               <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -53,15 +54,15 @@
             </button>
 
             <div class="hidden absolute right-0 top-full mt-2 w-56 z-50" data-dropdown-target="menu">
-              <div class="px-2 pt-2 pb-3 space-y-1 bg-gray-800 rounded-md shadow-lg">
+              <div class="p-1 bg-zinc-900 rounded-lg shadow-lg ring-1 ring-zinc-800">
                 <% if user_signed_in? %>
-                  <%= link_to 'Expenses', expenses_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
-                  <%= link_to 'Dashboard', dashboard_index_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
-                  <%= link_to 'Settings', settings_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
-                  <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium' %>
+                  <%= link_to 'Expenses',  expenses_path,        class: 'text-zinc-200 hover:text-white hover:bg-zinc-800 block px-3 py-2 rounded-md text-sm font-medium' %>
+                  <%= link_to 'Dashboard', dashboard_index_path, class: 'text-zinc-200 hover:text-white hover:bg-zinc-800 block px-3 py-2 rounded-md text-sm font-medium' %>
+                  <%= link_to 'Settings',  settings_path,        class: 'text-zinc-200 hover:text-white hover:bg-zinc-800 block px-3 py-2 rounded-md text-sm font-medium' %>
+                  <%= button_to 'Sign out', destroy_user_session_path, method: :delete, class: 'text-zinc-200 hover:text-white hover:bg-zinc-800 block w-full text-left px-3 py-2 rounded-md text-sm font-medium' %>
                 <% else %>
-                  <%= link_to 'Login', new_user_session_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
-                  <%= link_to 'Sign Up', new_user_registration_path, class: 'text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium' %>
+                  <%= link_to 'Log in',  new_user_session_path,      class: 'text-zinc-200 hover:text-white hover:bg-zinc-800 block px-3 py-2 rounded-md text-sm font-medium' %>
+                  <%= link_to 'Sign up', new_user_registration_path, class: 'text-zinc-200 hover:text-white hover:bg-zinc-800 block px-3 py-2 rounded-md text-sm font-medium' %>
                 <% end %>
               </div>
             </div>
@@ -70,24 +71,24 @@
       </div>
     </nav>
 
-    <main class="mt-4 sm:mt-8">
+    <main class="pt-4 sm:pt-6 pb-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <% if notice %>
-          <div class="flash-message bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md mb-4 relative" data-controller="flash" data-flash-auto-dismiss-value="5000">
+          <div class="flash-message bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-lg mb-4 relative text-sm" data-controller="flash" data-flash-auto-dismiss-value="5000">
             <%= notice %>
-            <button data-action="click->flash#dismiss" class="absolute top-0 right-0 mt-2 mr-2 text-green-600 hover:text-green-800">
+            <button data-action="click->flash#dismiss" class="absolute top-2 right-2 text-emerald-700 hover:text-emerald-900">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
               </svg>
             </button>
           </div>
         <% end %>
         <% if alert %>
-          <div class="flash-message bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-4 relative" data-controller="flash" data-flash-auto-dismiss-value="7000">
+          <div class="flash-message bg-rose-50 border border-rose-200 text-rose-900 px-4 py-3 rounded-lg mb-4 relative text-sm" data-controller="flash" data-flash-auto-dismiss-value="7000">
             <%= alert %>
-            <button data-action="click->flash#dismiss" class="absolute top-0 right-0 mt-2 mr-2 text-red-600 hover:text-red-800">
+            <button data-action="click->flash#dismiss" class="absolute top-2 right-2 text-rose-700 hover:text-rose-900">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
               </svg>
             </button>
           </div>

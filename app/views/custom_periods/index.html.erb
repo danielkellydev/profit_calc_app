@@ -1,41 +1,43 @@
-<div class="container mx-auto px-4 py-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Custom periods</h1>
+<div class="space-y-6">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+    <h1 class="font-display text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Custom periods</h1>
     <%= link_to 'New custom period', new_custom_period_path,
-          class: 'bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded' %>
+          class: 'bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2 px-3.5 rounded-lg self-start sm:self-auto' %>
   </div>
 
   <% if @custom_periods.any? %>
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
-          <tr>
-            <th class="px-4 py-2 text-left">Name</th>
-            <th class="px-4 py-2 text-left">Start</th>
-            <th class="px-4 py-2 text-left">End</th>
-            <th class="px-4 py-2 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-          <% @custom_periods.each do |period| %>
+    <div class="bg-white rounded-xl ring-1 ring-zinc-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-zinc-200 text-sm">
+          <thead class="bg-zinc-50/50 text-xs text-zinc-500 uppercase tracking-wider">
             <tr>
-              <td class="px-4 py-2 font-medium text-gray-900">
-                <%= link_to period.name, custom_period_path(period), class: 'text-blue-600 hover:text-blue-900' %>
-              </td>
-              <td class="px-4 py-2"><%= period.start_date&.strftime('%-d %b %Y') %></td>
-              <td class="px-4 py-2"><%= period.end_date&.strftime('%-d %b %Y') %></td>
-              <td class="px-4 py-2 text-right">
-                <%= button_to 'Delete', custom_period_path(period), method: :delete,
-                      form: { data: { turbo_confirm: 'Delete this custom period?' } },
-                      class: 'text-red-600 hover:text-red-900 bg-transparent p-0 border-0 cursor-pointer inline' %>
-              </td>
+              <th class="px-4 py-2.5 text-left font-medium">Name</th>
+              <th class="px-4 py-2.5 text-left font-medium">Start</th>
+              <th class="px-4 py-2.5 text-left font-medium">End</th>
+              <th class="px-4 py-2.5 text-right font-medium">Actions</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="bg-white divide-y divide-zinc-100">
+            <% @custom_periods.each do |period| %>
+              <tr class="hover:bg-zinc-50/50 transition">
+                <td class="px-4 py-2.5 font-medium text-zinc-900">
+                  <%= link_to period.name, custom_period_path(period), class: 'text-zinc-900 hover:underline underline-offset-2' %>
+                </td>
+                <td class="px-4 py-2.5 tabular-nums text-zinc-700"><%= period.start_date&.strftime('%-d %b %Y') %></td>
+                <td class="px-4 py-2.5 tabular-nums text-zinc-700"><%= period.end_date&.strftime('%-d %b %Y') %></td>
+                <td class="px-4 py-2.5 text-right">
+                  <%= button_to 'Delete', custom_period_path(period), method: :delete,
+                        form: { data: { turbo_confirm: 'Delete this custom period?' } },
+                        class: 'text-rose-600 hover:text-rose-800 font-medium bg-transparent p-0 border-0 cursor-pointer inline' %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
   <% else %>
-    <div class="bg-white shadow-md rounded-lg p-8 text-center text-gray-500">
+    <div class="bg-white rounded-xl ring-1 ring-zinc-200 p-8 text-center text-zinc-500">
       No custom periods yet.
     </div>
   <% end %>

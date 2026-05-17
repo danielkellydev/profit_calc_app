@@ -3,15 +3,27 @@ class ExpensesController < ApplicationController
   before_action :set_expense, only: [:show, :edit, :update, :destroy]
 
   def index
-    @expenses = current_user.expenses.includes(:expense_category).with_attached_receipts.order(:name)
-    @total_weekly_expenses    = @expenses.active.sum(&:weekly_amount)
-    @total_monthly_expenses   = @expenses.active.sum(&:monthly_amount)
-    @total_annual_expenses    = @expenses.active.sum(&:annual_amount)
-    @total_claimable_monthly  = @expenses.active.sum(&:claimable_monthly_amount)
-    @total_claimable_annual   = @expenses.active.sum(&:claimable_annual_amount)
-    @expenses_by_category = @expenses.active.group_by(&:expense_category)
-    @new_expense = current_user.expenses.build(active: true, frequency: 'monthly')
+    @fy = FinancialYear.from_param(params[:fy])
     @expense_categories = current_user.expense_categories.order(:name)
+
+    all_expenses = current_user.expenses.includes(:expense_category).with_attached_receipts
+
+    one_off_scope = all_expenses.active.where(frequency: 'one_off').for_period(@fy.first, @fy.last)
+    @one_offs = one_off_scope.sort_by { |e| e.start_date || Date.new(0) }.reverse
+
+    @recurring_by_category = all_expenses.active.where.not(frequency: 'one_off').order(:name).group_by(&:expense_category)
+    @recurring_count = @recurring_by_category.values.sum(&:size)
+
+    fy_expenses = all_expenses.for_period(@fy.first, @fy.last)
+    @one_off_fy_total      = @one_offs.sum(&:amount)
+    @claimable_fy_total    = fy_expenses.sum(&:claimable_annual_amount)
+    @recurring_annual_total = fy_expenses.reject(&:one_off?).sum(&:claimable_annual_amount)
+
+    @new_one_off = current_user.expenses.build(
+      active: true,
+      frequency: 'one_off',
+      start_date: Date.current
+    )
   end
 
   def show

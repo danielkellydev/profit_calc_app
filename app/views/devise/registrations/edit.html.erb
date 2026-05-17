@@ -1,43 +1,58 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<div class="max-w-xl mx-auto px-4 py-8 sm:py-12">
+  <h1 class="font-display text-2xl sm:text-3xl font-bold text-zinc-900 mb-6">Account settings</h1>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <div class="bg-white rounded-xl shadow-sm ring-1 ring-zinc-200 p-6 sm:p-8">
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-4" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
+      <div>
+        <%= f.label :email, class: "block text-sm font-medium text-zinc-700" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email",
+            class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
+        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+          <p class="mt-1 text-xs text-amber-700">Waiting confirmation for: <%= resource.unconfirmed_email %></p>
+        <% end %>
+      </div>
 
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
+      <div>
+        <%= f.label :password, "New password", class: "block text-sm font-medium text-zinc-700" %>
+        <%= f.password_field :password, autocomplete: "new-password",
+            class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
+        <p class="mt-1 text-xs text-zinc-500">
+          Leave blank to keep your current password<% if @minimum_password_length %> · <%= @minimum_password_length %> characters minimum<% end %>.
+        </p>
+      </div>
 
-  <div class="field">
-    <%= f.label :password %> <i>(leave blank if you don't want to change it)</i><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-    <% if @minimum_password_length %>
-      <br />
-      <em><%= @minimum_password_length %> characters minimum</em>
+      <div>
+        <%= f.label :password_confirmation, "Confirm new password", class: "block text-sm font-medium text-zinc-700" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password",
+            class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
+      </div>
+
+      <div>
+        <%= f.label :current_password, class: "block text-sm font-medium text-zinc-700" %>
+        <%= f.password_field :current_password, autocomplete: "current-password",
+            class: "mt-1 block w-full rounded-lg border-zinc-300 shadow-sm focus:border-zinc-900 focus:ring-zinc-900 text-sm" %>
+        <p class="mt-1 text-xs text-zinc-500">Required to confirm any changes.</p>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <%= link_to "Back", :back,
+              class: "bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-900 text-sm font-medium py-2 px-4 rounded-lg" %>
+        <%= f.submit "Update account",
+              class: "bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold py-2 px-4 rounded-lg cursor-pointer" %>
+      </div>
     <% end %>
   </div>
 
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+  <div class="mt-8 bg-white rounded-xl ring-1 ring-rose-200 p-6">
+    <h2 class="font-semibold text-rose-900">Cancel my account</h2>
+    <p class="mt-1 text-sm text-zinc-600">This deletes your data permanently and can't be undone.</p>
+    <div class="mt-4">
+      <%= button_to "Cancel my account", registration_path(resource_name),
+            method: :delete,
+            data: { turbo_confirm: "Delete your account? This can't be undone." },
+            class: "bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold py-2 px-4 rounded-lg" %>
+    </div>
   </div>
-
-  <div class="field">
-    <%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i><br />
-    <%= f.password_field :current_password, autocomplete: "current-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+</div>
